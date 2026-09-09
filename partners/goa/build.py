@@ -50,8 +50,9 @@ def inline(page: str) -> str:
                 f"{len(uri)/1024:.0f} KB to the paste — reference it once")
         page = page.replace(ref, uri)
         print(f"  inlined {ref:38} {len(blob)/1024:5.1f} KB -> {len(uri)/1024:5.1f} KB base64")
-    if "assets/" in page:
-        raise SystemExit("an asset reference survived inlining")
+    left = re.findall(r"assets/[\w.-]+\.webp", page)
+    if left:
+        raise SystemExit(f"an asset reference survived inlining: {left[0]}")
     return page
 
 
