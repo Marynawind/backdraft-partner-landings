@@ -84,7 +84,16 @@ LINKS = {
 }
 POSTER_MAP = HERE / "assets" / "poster-map.json"
 HEAD_BOTTOM = 502                  # низ шапки: логотип, заголовок, подпись, линейка
-UNDERLINE = (6, 2)                 # отступ от базовой линии и толщина
+# Отступ подчёркивания задан от метрик, а не на глаз: базовая линия стоит
+# в 37 px от верха строки, интерлиньяж 40 — до верха следующей строки остаётся
+# 3 px, а её буквы начинаются ещё на 8 px ниже. При отступе 8 линия уезжала
+# на следующую строку и перечёркивала её. Отступ 4 держит её под своей строкой.
+UNDERLINE = (4, 2)                 # отступ от базовой линии и толщина
+DESC = 9                           # запас под выносные элементы под базовой линией
+# Подчёркивание не идёт сплошняком: под выносными элементами («p» в
+# Suppressors.com, «p» в Adapter) оно рвётся, как text-decoration-skip-ink
+# в браузере. Иначе линия перечёркивает хвосты букв.
+SKIP = 3                           # запас пустоты слева и справа от буквы
 HOT_PAD = 10                       # запас рамки клика вокруг слова
 
 ICON_SRC = {                       # откуда режем иконки, замер по исходникам
@@ -170,8 +179,9 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
     # карточек, и в исходные 1024 px они не помещаются. Дорощенные снизу строки
     # чёрные — там и так только затухающая тень рендера, а на странице картинка
     # накладывается блендингом screen, так что чёрное не видно вовсе.
-    steps_h = sum(2 * STEP_GAP + STEP_LEAD * len(wrap(t, f_step, x1 - PAD - TEXT_X))
-                  for t in STEPS) + len(STEPS) - 1
+    rows_per_step = [len(wrap(t, f_step, x1 - PAD - TEXT_X)) for t in STEPS]
+    steps_h = sum(2 * STEP_GAP + STEP_CAP + (n - 1) * STEP_LEAD + DESC
+                  for n in rows_per_step) + len(STEPS) - 1
     col_w = (x1 - x0 + 1) // 3
     inner = col_w - 2 * PAD - MARK_COL - GUTTER
     rows = max(len(wrap(b, f_body, inner)) + (1 if h else 0) for _, h, b in COLUMNS)
@@ -205,30 +215,45 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
     draw.rectangle(SUB_BOX, fill=(0, 0, 0))
     put(SUB_X, SUB_BASE, SUBTITLE, sized(REG, SUB_CAP), INK, anchor="ls")
 
-    ascent = f_step.getmetrics()[0] / SS
     hotspots = []
 
+    # Набираем по явной базовой линии: PIL при anchor="lt" ставит текст по верху
+    # чернил, а не по метрике шрифта, и вычисленная из ascent базовая уезжала
+    # на 9 px вниз — подчёркивание попадало на следующую строку.
     y = ZONE_TOP
     for i, step in enumerate(STEPS, 1):
         lines = wrap(step, f_step, x1 - PAD - TEXT_X)
-        top = y + STEP_GAP
+        cap_top = y + STEP_GAP
         num = f"{i}."
         nx = x0 + PAD + (MARK_COL - f_num.getlength(num) / SS) / 2
-        put(nx, top + STEP_CAP - NUM_CAP, num, f_num, BRASS)
+        put(nx, cap_top + STEP_CAP, num, f_num, BRASS, anchor="ls")
         for j, line in enumerate(lines):
-            put(TEXT_X, top + j * STEP_LEAD, line, f_step, INK)
+            base = cap_top + STEP_CAP + j * STEP_LEAD
+            put(TEXT_X, base, line, f_step, INK, anchor="ls")
             phrase, href = LINKS.get(i, (None, None))
             if not phrase or phrase not in line:
                 continue
             lx = TEXT_X + f_step.getlength(line[:line.index(phrase)]) / SS
             lw = f_step.getlength(phrase) / SS
-            base = top + j * STEP_LEAD + ascent
-            ink.rectangle((lx * SS, (base + UNDERLINE[0]) * SS,
-                           (lx + lw) * SS, (base + UNDERLINE[0] + UNDERLINE[1]) * SS), fill=BRASS)
+            top_px = round((base + UNDERLINE[0]) * SS)
+            bot_px = round((base + UNDERLINE[0] + UNDERLINE[1]) * SS)
+            lp = layer.load()
+            busy = set()
+            for px_x in range(round(lx * SS), round((lx + lw) * SS)):
+                if any(lp[px_x, py][0] > 40 for py in range(top_px - SS, bot_px + SS)):
+                    busy.update(range(px_x - SKIP * SS, px_x + SKIP * SS + 1))
+            run = None
+            for px_x in range(round(lx * SS), round((lx + lw) * SS) + 1):
+                free = px_x not in busy and px_x < round((lx + lw) * SS)
+                if free and run is None:
+                    run = px_x
+                elif not free and run is not None:
+                    ink.rectangle((run, top_px, px_x - 1, bot_px), fill=BRASS)
+                    run = None
             hotspots.append({"href": href, "label": phrase,
-                             "box": (lx - HOT_PAD / 2, top + j * STEP_LEAD - HOT_PAD / 2,
-                                     lw + HOT_PAD, STEP_LEAD + HOT_PAD)})
-        y = top + len(lines) * STEP_LEAD + STEP_GAP
+                             "box": (lx - HOT_PAD / 2, base - STEP_CAP - HOT_PAD / 2,
+                                     lw + HOT_PAD, STEP_CAP + DESC + HOT_PAD)})
+        y = cap_top + STEP_CAP + (len(lines) - 1) * STEP_LEAD + DESC + STEP_GAP
         if i < len(STEPS):
             draw.line((x0, y, x1, y), fill=LINE)
             y += 1
