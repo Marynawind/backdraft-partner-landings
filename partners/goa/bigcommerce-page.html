@@ -32,7 +32,7 @@
   --brass-lit:#E3B25F;
   /* type scale */
   --f:"Manrope","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --t-label:13px;
+  --t-label:14px;
   --t-micro:14px;
   --t-legal:16px;
   --t-body:17px;
@@ -301,7 +301,8 @@ figure.bdg-poster{position:relative;}
    нужно: обрезка чисто на CSS, лишних байтов не добавляет.
    Высоту шапки подставляет build.py из assets/poster-map.json — она меняется
    вместе с раскладкой картинки. */
-.bdg-steplist,.bdg-perks{display:none;}
+.bdg-sub,.bdg-steplist,.bdg-perks{display:none;}
+.bdg-sub{color:var(--muted);font-size:var(--t-lead);margin-top:var(--s4);}
 ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
 .bdg-steplist li{
   display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
@@ -419,7 +420,6 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
      Мелкий текст на нём на телефоне не прочитать, но это и не нужно: те же
      четыре шага идут ниже живым текстом в бегущей строке, а сама картинка
      работает как иллюстрация. */
-  .bdg{--t-label:13px;}
 }
 @media (max-width:620px){
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
@@ -429,7 +429,7 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
      привычный системный, а места по ширине после отказа от узкой колонки
      хватает. Заодно снят предел ширины у абзацев условий — 59ch держали
      колонку в две трети экрана. */
-  .bdg{--s8:48px;--s6:32px;--t-label:14px;--t-body:18px;--t-lead:20px;--t-micro:15px;--t-legal:18px;}
+  .bdg{--s8:48px;--s6:32px;--t-body:18px;--t-lead:20px;--t-micro:15px;--t-legal:18px;}
   .bdg-legal p{max-width:none;}
   .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
   .bdg-cobrand{margin-bottom:var(--s5);}
@@ -440,10 +440,11 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
 }
 @media (max-width:700px){
   /* картинка обрезается до шапки: остальное её содержимое ниже живым текстом */
-  .bdg-poster img{aspect-ratio:1536/502;object-fit:cover;object-position:center top;}
+  .bdg-poster img{aspect-ratio:1536/420;object-fit:cover;object-position:center top;}
   /* области клика считаны от полной картинки и на обрезанной не совпадут,
      а живой текст ниже несёт те же ссылки настоящими */
   .bdg-hot{display:none;}
+  .bdg-sub{display:block;}
   .bdg-steplist{display:grid;}
   .bdg-perks{display:grid;}
 }
@@ -491,6 +492,8 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
       <a class="bdg-hot" href="https://backdraftsuppressors.com/backdraft-hunter/" aria-label="4&quot; Hunter" style="left:18.815%;top:48.475%;width:10.286%;height:3.71%"></a>
       <a class="bdg-hot" href="https://backdraftsuppressors.com/adapters/" aria-label="HUB Adapter" style="left:30.36%;top:57.214%;width:14.149%;height:3.71%"></a>
     </figure>
+
+    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor:</p>
 
     <ol class="bdg-steplist">
       <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>

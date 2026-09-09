@@ -32,7 +32,7 @@
   --brass-lit:#E3B25F;
   /* type scale */
   --f:"Manrope","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --t-label:13px;
+  --t-label:14px;
   --t-micro:14px;
   --t-legal:16px;
   --t-body:17px;
@@ -301,7 +301,8 @@ figure.bdg-poster{position:relative;}
    нужно: обрезка чисто на CSS, лишних байтов не добавляет.
    Высоту шапки подставляет build.py из assets/poster-map.json — она меняется
    вместе с раскладкой картинки. */
-.bdg-steplist,.bdg-perks{display:none;}
+.bdg-sub,.bdg-steplist,.bdg-perks{display:none;}
+.bdg-sub{color:var(--muted);font-size:var(--t-lead);margin-top:var(--s4);}
 ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
 .bdg-steplist li{
   display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
@@ -419,7 +420,6 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
      Мелкий текст на нём на телефоне не прочитать, но это и не нужно: те же
      четыре шага идут ниже живым текстом в бегущей строке, а сама картинка
      работает как иллюстрация. */
-  .bdg{--t-label:13px;}
 }
 @media (max-width:620px){
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
@@ -429,7 +429,7 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
      привычный системный, а места по ширине после отказа от узкой колонки
      хватает. Заодно снят предел ширины у абзацев условий — 59ch держали
      колонку в две трети экрана. */
-  .bdg{--s8:48px;--s6:32px;--t-label:14px;--t-body:18px;--t-lead:20px;--t-micro:15px;--t-legal:18px;}
+  .bdg{--s8:48px;--s6:32px;--t-body:18px;--t-lead:20px;--t-micro:15px;--t-legal:18px;}
   .bdg-legal p{max-width:none;}
   .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
   .bdg-cobrand{margin-bottom:var(--s5);}
@@ -444,6 +444,7 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
   /* области клика считаны от полной картинки и на обрезанной не совпадут,
      а живой текст ниже несёт те же ссылки настоящими */
   .bdg-hot{display:none;}
+  .bdg-sub{display:block;}
   .bdg-steplist{display:grid;}
   .bdg-perks{display:grid;}
 }
@@ -489,6 +490,8 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
       <img src="assets/redemption-infographic.webp" width="1300" height="1027" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor: Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
       <!--poster-links-->
     </figure>
+
+    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor:</p>
 
     <ol class="bdg-steplist">
       <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>
