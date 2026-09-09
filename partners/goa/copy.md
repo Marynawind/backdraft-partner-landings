@@ -26,38 +26,29 @@ As a GOA member, you're eligible to redeem your **Free Suppressor Rebate**.
 без чтения условий.
 
 ## 3. How to Redeem Your Rebate
-*Use your rebate code at checkout to redeem your 4" Hunter Suppressor (non-magnum).*
 
-Четыре шага показаны одной инфографикой клиента (`assets/redemption-infographic.webp`),
-дословно как на getoutlier.com/redemption:
+**Eyebrow:** Six steps
+**H2:** How to Redeem Your *Rebate*
+**Подзаголовок:** Use your rebate code at checkout to redeem your 4" Hunter Suppressor:
 
-1. **Visit the Website** — Start your rebate redemption online at BackdraftSuppressors.com.
-2. **Select Your Suppressor** — Choose your free 4" Hunter Suppressor (non-magnum).
-3. **Add Required HUB Adapter\*** — Select the required HUB thread adapter for your suppressor.
-4. **Enter Your Rebate Code** — Apply your code at checkout and choose your preferred FFL/SOT for transfer.
+1. Visit BackdraftSuppressors.com
+2. Select a 4" Hunter, or upgrade to 6", 8", or steel Poacher for an additional cost.
+3. Select the required HUB Adapter
+4. Enter the rebate code at checkout.
+5. Select your preferred FFL/SOT for suppressor transfer.
+6. Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.
 
-Раньше эти же шаги дублировались под инфографикой четырьмя карточками —
-карточки убраны по решению клиента. Поэтому текст шагов теперь существует
-только внутри картинки: он полностью продублирован в её `alt`, иначе шаги
-не читались бы ни поиском, ни скринридером. **При замене инфографики нужно
-обновить и `alt`.**
+Текст клиента дословно, получен 09.09.2026. Справа от шагов — рендер глушителя,
+вырезанный из прежней инфографики.
 
-Подпись под инфографикой (видна только на узких экранах):
-**Swipe the graphic sideways to read all four steps.**
-
-### Бегущая строка «How it works»
-
-Под инфографикой — лента: те же четыре шага едут справа налево, круг 22 с.
-Тексты шагов дословно те же, что в списке выше. Подписи в шапке блока:
-
-- **How it works**
-- **Four steps**
-
-Иллюстрации — те самые, из убранных карточек. При выключенной анимации
-(`prefers-reduced-motion`) лента становится обычной сеткой 2×2.
+⚠️ **Инфографика как картинка больше не используется.** Раньше эти же шаги
+несла она: на телефоне её шрифт не читался, в поиск и скринридер она попадала
+только через `alt`, и весила 89 КБ после base64. Сейчас шаги — живой текст,
+а от картинки оставлен только объект справа (36 КБ). Прежние четыре шага
+заменены этими шестью.
 
 **Ready to Redeem?** Choose your 4" Hunter Suppressor, add the required HUB Adapter, and enter your rebate code at checkout.
-**Кнопка:** Redeem Your Suppressor Now → `/backdraft-hunter/`
+**Кнопка:** Redeem Your Suppressor Now → `backdraftsuppressors.com/backdraft-hunter/`
 
 ## 4. Please Note
 
@@ -75,14 +66,19 @@ Visit the Website → `backdraftsuppressors.com`
 
 ## 6. Terms & Conditions
 
-Заголовок: **Terms & Conditions**, дальше три сплошных абзаца — текст клиента
-дословно, получен 09.09.2026.
+Заголовок: **Terms & Conditions**, дальше три блока — текст клиента дословно,
+получен 09.09.2026.
 
-Абзацы по темам:
-1. Что покрывает рибейт и что нет, правила использования кода.
-2. Ответственность покупателя, передача через FFL/SOT, HUB-адаптер,
-   законность, право отозвать рибейт.
-3. Возвраты и отмены, право менять условия промо.
+Над каждым абзацем — латунный надзаголовок, добавлен для навигации по тексту:
+
+1. **Rebate and codes** — что покрывает рибейт и что нет, правила кода.
+2. **Eligibility and transfer** — ответственность покупателя, FFL/SOT,
+   HUB-адаптер, законность, право отозвать рибейт.
+3. **Cancellations and program changes** — возвраты и отмены, право менять промо.
+
+⚠️ Надзаголовки — **не часть условий**, а навигация. Слова самих условий
+не тронуты, надзаголовки снимаются без юридических последствий.
+Первая фраза первого абзаца выделена светлым: ею покупатель даёт согласие.
 
 ⚠️ **Прежняя версия заменена целиком.** До этого здесь были 18 нумерованных
 разделов (Important Customer Responsibility Notice … Severability) плюс блок

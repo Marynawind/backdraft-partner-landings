@@ -72,8 +72,8 @@
 .bdg *,.bdg *::before,.bdg *::after{box-sizing:border-box;}
 /* ⚠️ Сброс задан по типу элемента, поэтому он специфичнее (0,1,1) любого
    правила по одному классу (0,1,0) и молча съедает у них margin и padding.
-   Любому figure/ol/ul/li со своими отступами селектор пишем с именем тега:
-   например figure.bdg-poster. */
+   Любому figure/ol/ul/li со своими отступами селектор пишем с именем тега,
+   например ol.bdg-steplist. */
 .bdg p,.bdg h1,.bdg h2,.bdg h3,.bdg h4,.bdg ul,.bdg ol,.bdg li,.bdg figure{margin:0;padding:0;}
 .bdg ul,.bdg ol{list-style:none;}
 .bdg img{display:block;max-width:100%;height:auto;}
@@ -283,18 +283,37 @@
 .bdg-steps h2 em{font-style:normal;color:var(--brass-lit);}
 .bdg-steps .bdg-sub{color:var(--muted);font-size:var(--t-lead);max-width:56ch;margin-top:var(--s2);}
 
-/* The poster carries its own black ground, which would sit on the page as a
-   slab. It cannot be cut out — its dark tones are content (see tools-cutout.py)
-   — so the ground is cancelled at render time instead: screen blending against
-   an exactly black source returns the backdrop untouched, and the artwork
-   floats straight on the page gradient. No frame either: with the ground gone
-   a border would outline empty space.
-   Cost of the trick: no ancestor may carry a transform (that would make a
-   stacking context and bring the black slab back), and the page behind it must
-   stay dark. Both hold here — unlike the hero artwork, the poster is static. */
-figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
-/* всегда по ширине колонки: и уменьшается вместе с окном, и не вылезает */
-.bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
+/* Шаги — живым текстом, а не картинкой. Инфографика несла те же сведения
+   растром: на телефоне её мелкий шрифт не читался, в поиск и скринридер она
+   попадала только через alt, и весила 89 КБ после base64.
+   От картинки оставлен сам рендер глушителя — он справа от шагов. */
+.bdg-stepsgrid{
+  margin-top:var(--s5);display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,.42fr);
+  gap:var(--s6);align-items:center;
+}
+/* Рендер лежит на собственном чёрном фоне. Вырезать его нельзя — это фото
+   тёмного объекта, порог съел бы половину. Поэтому фон гасится блендингом:
+   screen против строго чёрного возвращает подложку нетронутой, а чёрная точка
+   у файла опущена заранее (tools-cutout.py), иначе остался бы светлый
+   прямоугольник. Цена приёма: никаких transform на родителях. */
+.bdg-stepart img{display:block;width:100%;height:auto;mix-blend-mode:screen;}
+ol.bdg-steplist{display:grid;gap:0;counter-reset:step;}
+.bdg-steplist li{
+  display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
+  align-items:baseline;padding:var(--s3) 0;border-top:1px solid var(--line-soft);
+}
+.bdg-steplist li:last-child{border-bottom:1px solid var(--line-soft);}
+.bdg-steplist li::before{
+  counter-increment:step;content:counter(step);
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:var(--brass);color:#15100A;
+  font-size:var(--t-micro);font-weight:800;font-variant-numeric:tabular-nums;
+  transform:translateY(4px);
+}
+.bdg-steplist p{font-size:var(--t-lead);color:var(--text);line-height:1.5;max-width:56ch;}
+.bdg-steplist a{color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--brass);}
+.bdg-steplist a:hover{color:var(--brass-lit);}
 
 /* ---------- Ролик «как это работает» ---------------------------------------
    Видео-инструкция без видео: четыре шага сменяют друг друга сами, по 2 с,
@@ -326,23 +345,34 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
 /* ---------- 5. Terms and Conditions --------------------------------------- */
 .bdg-legal{background:var(--recess);border-top:1px solid var(--line);}
 .bdg-legal .bdg-wrap{max-width:880px;}
-/* Условия переписаны клиентом в три сплошных абзаца — нумерованных разделов,
-   списков и вводного блока больше нет, их правила удалены.
-   Заголовок здесь единственный, поэтому он крупнее прежнего служебного
+/* Заголовок секции единственный, поэтому он крупнее прежнего служебного
    ярлыка, но мельче заголовков остальных секций: это юридический текст,
    он не должен спорить за внимание с офером. */
 .bdg-legal h2{
   font-size:clamp(22px,2.2vw,28px);font-weight:800;letter-spacing:-.02em;
   color:#fff;line-height:1.2;
 }
-/* Колонка 880px даёт около 100 знаков в строке — для трёх длинных абзацев
-   это много, глаз теряет начало следующей строки. Ограничиваем меру примерно
+/* Три сплошных абзаца юридического текста читаются тяжело, поэтому каждый
+   получил латунный надзаголовок — тот же приём, что у всех секций страницы,
+   и волоски-разделители, как в списке шагов. Слова самих условий не тронуты:
+   надзаголовки — навигация, а не часть текста, и снимаются без последствий. */
+.bdg-terms{margin-top:var(--s5);display:grid;}
+.bdg-terms article{padding:var(--s5) 0;border-top:1px solid var(--line-soft);}
+.bdg-terms article:last-child{border-bottom:1px solid var(--line-soft);}
+.bdg-terms h3{
+  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--brass-lit);
+}
+/* первая фраза — операционная: ей клиент даёт согласие, поэтому она светлее */
+.bdg-terms b{color:var(--text);font-weight:600;}
+/* Колонка 880px даёт около 100 знаков в строке — для длинных абзацев это
+   много, глаз теряет начало следующей строки. Ограничиваем меру примерно
    до 72 знаков. Значение в ch подобрано замером, а не на глаз: единица ch
    равна ширине цифры, а она заметно шире средней строчной буквы, поэтому
    74ch давали не 74 знака, а 90. */
 .bdg-legal p{
   font-size:var(--t-legal);line-height:1.75;color:var(--muted);
-  margin-top:var(--s4);max-width:59ch;
+  margin-top:var(--s2);max-width:59ch;
 }
 
 /* ---------- 6. Close ------------------------------------------------------ */
@@ -382,6 +412,11 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
      четыре шага идут ниже живым текстом в бегущей строке, а сама картинка
      работает как иллюстрация. */
   .bdg{--t-label:13px;}
+}
+@media (max-width:860px){
+  /* на узком экране рендер уходит под шаги и сжимается */
+  .bdg-stepsgrid{grid-template-columns:1fr;gap:var(--s4);}
+  .bdg-stepart{max-width:230px;margin:0 auto;}
 }
 @media (max-width:620px){
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
@@ -432,13 +467,23 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
 <!-- 3. How to Redeem Your Rebate -->
 <section class="bdg-steps" id="how-to-redeem">
   <div class="bdg-wrap">
-    <p class="bdg-label">Four steps</p>
+    <p class="bdg-label">Six steps</p>
     <h2>How to Redeem Your <em>Rebate</em></h2>
-    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor (non-magnum).</p>
+    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor:</p>
 
-    <figure class="bdg-poster">
-      <img src="assets/redemption-infographic.webp" width="1300" height="867" alt="Four steps to redeem your free suppressor rebate: visit BackdraftSuppressors.com, select your free 4-inch Hunter Suppressor (non-magnum), add the required HUB thread adapter, then enter your rebate code at checkout." loading="lazy">
-    </figure>
+    <div class="bdg-stepsgrid">
+    <ol class="bdg-steplist">
+      <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>
+      <li><p>Select a <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter</a>, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost.</p></li>
+      <li><p>Select the required <a href="https://backdraftsuppressors.com/adapters/">HUB Adapter</a></p></li>
+      <li><p>Enter the rebate code at checkout.</p></li>
+      <li><p>Select your preferred FFL/SOT for suppressor transfer.</p></li>
+      <li><p>Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.</p></li>
+    </ol>
+      <figure class="bdg-stepart">
+        <img src="assets/hero-suppressor.webp" width="640" height="1033" alt="Outlier 4&Prime; Hunter suppressor, BH4 6.5 mm" loading="lazy">
+      </figure>
+    </div>
 
     <div class="bdg-notecard">
       <h2><span class="bdg-ast">*</span>Please note:</h2>
@@ -461,11 +506,22 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
   <div class="bdg-wrap">
     <h2>Terms &amp; Conditions</h2>
 
-    <p>By redeeming the Free Suppressor Rebate, the customer acknowledges and agrees to these Terms and Conditions. Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor. Where available, the rebate may be applied toward an eligible suppressor upgrade, with the customer responsible for any price difference. The rebate applies to the suppressor only and does not include the required HUB Adapter, shipping or handling, taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT fees, dealer fees, or any other applicable charges. All products, configurations, finishes, calibers, and upgrade options are subject to availability. Rebate codes have no cash value and may not be duplicated, altered, or fraudulently generated. Codes may be transferred or gifted to another eligible person but may not be combined with other discounts or promotions unless expressly authorized.</p>
+    <div class="bdg-terms">
+      <article>
+        <h3>Rebate and codes</h3>
+        <p><b>By redeeming the Free Suppressor Rebate, the customer acknowledges and agrees to these Terms and Conditions.</b> Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor. Where available, the rebate may be applied toward an eligible suppressor upgrade, with the customer responsible for any price difference. The rebate applies to the suppressor only and does not include the required HUB Adapter, shipping or handling, taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT fees, dealer fees, or any other applicable charges. All products, configurations, finishes, calibers, and upgrade options are subject to availability. Rebate codes have no cash value and may not be duplicated, altered, or fraudulently generated. Codes may be transferred or gifted to another eligible person but may not be combined with other discounts or promotions unless expressly authorized.</p>
+      </article>
 
-    <p>The customer is responsible for ensuring they are legally eligible to purchase, possess, and receive a suppressor and for complying with all applicable federal, state, and local laws. Suppressors must be transferred through a qualified FFL/SOT, and the customer is responsible for selecting the FFL/SOT and paying all associated transfer, processing, storage, tax, and other third-party fees. A compatible HUB Adapter is required and must be purchased separately; the customer is responsible for confirming compatibility with their firearm and intended setup. This promotion is available only where suppressors are legal and is void where prohibited or restricted by law. Redemption of a rebate code does not guarantee eligibility or completion of a transfer. In the event of a returned or cancelled qualifying purchase, chargeback, fraudulent or unauthorized use, ineligibility, or violation of these terms, Backdraft Suppressors reserves the right to void or cancel the rebate, redemption, or order and recover the promotional value where applicable.</p>
+      <article>
+        <h3>Eligibility and transfer</h3>
+        <p>The customer is responsible for ensuring they are legally eligible to purchase, possess, and receive a suppressor and for complying with all applicable federal, state, and local laws. Suppressors must be transferred through a qualified FFL/SOT, and the customer is responsible for selecting the FFL/SOT and paying all associated transfer, processing, storage, tax, and other third-party fees. A compatible HUB Adapter is required and must be purchased separately; the customer is responsible for confirming compatibility with their firearm and intended setup. This promotion is available only where suppressors are legal and is void where prohibited or restricted by law. Redemption of a rebate code does not guarantee eligibility or completion of a transfer. In the event of a returned or cancelled qualifying purchase, chargeback, fraudulent or unauthorized use, ineligibility, or violation of these terms, Backdraft Suppressors reserves the right to void or cancel the rebate, redemption, or order and recover the promotional value where applicable.</p>
+      </article>
 
-    <p>Due to the regulated nature of suppressors, orders may not be eligible for cancellation, return, exchange, or refund after shipment, transfer, or required paperwork has begun, except where required by law. Backdraft Suppressors reserves the right to modify, suspend, extend, or terminate this promotion, change eligible products or requirements, substitute products of equal or greater value when necessary, or deny or revoke any redemption involving misuse, fraud, error, ineligibility, or violation of these Terms and Conditions. All redemptions are subject to product availability and applicable law.</p>
+      <article>
+        <h3>Cancellations and program changes</h3>
+        <p>Due to the regulated nature of suppressors, orders may not be eligible for cancellation, return, exchange, or refund after shipment, transfer, or required paperwork has begun, except where required by law. Backdraft Suppressors reserves the right to modify, suspend, extend, or terminate this promotion, change eligible products or requirements, substitute products of equal or greater value when necessary, or deny or revoke any redemption involving misuse, fraud, error, ineligibility, or violation of these Terms and Conditions. All redemptions are subject to product availability and applicable law.</p>
+      </article>
+    </div>
   </div>
 </section>
 
