@@ -1,7 +1,8 @@
 # /GOA — тексты страницы
 
-Формулировки из ТЗ клиента даны дословно. Шаги редемпшена и мелкий шрифт —
-дословно с https://getoutlier.com/redemption.
+Формулировки из ТЗ клиента даны дословно. Шаги редемпшена — дословно
+с https://getoutlier.com/redemption; условия (раздел 6) с 09.09.2026 заменены
+собственной версией клиента и с этой страницей больше не совпадают.
 
 ## 1. Welcome (hero)
 **Наверху:** логотип Gun Owners of America (без подписи рядом)
@@ -72,20 +73,26 @@ Visit the Website → `backdraftsuppressors.com`
 
 Все ссылки на странице абсолютные, на `https://backdraftsuppressors.com`.
 
-## 6. Terms and Conditions
-Заголовок документа: **Backdraft Suppressors Free Suppressor Rebate — Customer Acknowledgement of Required Rebate Terms**, подзаголовок **Terms and Conditions**.
+## 6. Terms & Conditions
 
-Полный текст условий свёрстан в `bigcommerce-page.html` (секция `.bdg-legal`),
-18 разделов: Important Customer Responsibility Notice · Eligible Rebate Item ·
-Rebate Code Use · Rebate Expiration · How to Redeem · Required HUB Adapter ·
-Customer Fees, Taxes, and Transfer Costs · FFL/SOT Transfer Process ·
-Lead Time and Fulfillment · Availability and Substitutions ·
-No Stacking or Cash Redemption · Returns, Cancellations, and Refunds ·
-Eligibility and Legal Compliance · Misuse, Fraud, and Revocation ·
-Program Changes · Errors and Technical Issues · Severability.
+Заголовок: **Terms & Conditions**, дальше три сплошных абзаца — текст клиента
+дословно, получен 09.09.2026.
 
-Текст дословный, предоставлен клиентом. Любая правка должна вноситься
-одновременно здесь и на getoutlier.com/redemption — иначе условия разойдутся.
+Абзацы по темам:
+1. Что покрывает рибейт и что нет, правила использования кода.
+2. Ответственность покупателя, передача через FFL/SOT, HUB-адаптер,
+   законность, право отозвать рибейт.
+3. Возвраты и отмены, право менять условия промо.
+
+⚠️ **Прежняя версия заменена целиком.** До этого здесь были 18 нумерованных
+разделов (Important Customer Responsibility Notice … Severability) плюс блок
+Customer Acknowledgement. Всё удалено: новый первый абзац начинается с той же
+формулировки про согласие и заменяет собой Acknowledgement.
+
+⚠️ **Раньше условия обязаны были совпадать с getoutlier.com/redemption.**
+Новый текст короче и сформулирован иначе — это версия клиента, и она
+расходится с тем, что опубликовано на getoutlier.com. Если обе страницы должны
+говорить одно и то же, синхронизировать их — задача клиента.
 
 ## Открытые вопросы к клиенту
 - Логотип GOA поставлен наверх страницы по решению клиента (09.09.2026).

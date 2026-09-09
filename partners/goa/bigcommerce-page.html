@@ -115,11 +115,11 @@
 .bdg-cta-row .bdg-btn{width:100%;}
 
 /* one card recipe, used by every boxed block */
-.bdg-ready,.bdg-notecard,.bdg-ack{
+.bdg-ready,.bdg-notecard{
   border:1px solid var(--line);border-radius:var(--radius);
   padding:var(--pad-card);
 }
-.bdg-ready,.bdg-notecard,.bdg-ack{background:var(--lift);border-left:3px solid var(--brass);}
+.bdg-ready,.bdg-notecard{background:var(--lift);border-left:3px solid var(--brass);}
 
 /* line art ships as a transparent cut-out (see tools-cutout.py), so it needs no
    blend mode — which is what frees its wrapper to carry a transform */
@@ -326,40 +326,24 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
 /* ---------- 5. Terms and Conditions --------------------------------------- */
 .bdg-legal{background:var(--recess);border-top:1px solid var(--line);}
 .bdg-legal .bdg-wrap{max-width:880px;}
-.bdg-ack{margin-bottom:var(--s6);}
-.bdg-ack h3{
-  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--brass-lit);margin:0;padding:0;border:0;
-}
-.bdg-ack p{font-size:var(--t-legal);line-height:1.7;color:var(--muted);margin-top:var(--s2);}
-.bdg-legal .bdg-doctitle{
-  font-size:clamp(18px,2.1vw,23px);font-weight:800;color:#fff;margin-top:var(--s2);
-  text-transform:uppercase;line-height:1.3;letter-spacing:-.005em;
-}
+/* Условия переписаны клиентом в три сплошных абзаца — нумерованных разделов,
+   списков и вводного блока больше нет, их правила удалены.
+   Заголовок здесь единственный, поэтому он крупнее прежнего служебного
+   ярлыка, но мельче заголовков остальных секций: это юридический текст,
+   он не должен спорить за внимание с офером. */
 .bdg-legal h2{
-  font-size:var(--t-label);font-weight:800;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--brass-lit);margin-top:var(--s1);
+  font-size:clamp(22px,2.2vw,28px);font-weight:800;letter-spacing:-.02em;
+  color:#fff;line-height:1.2;
 }
-.bdg-legal .bdg-legalintro{margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--line);}
-.bdg-legal h3{
-  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--brass-lit);margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--line-soft);
+/* Колонка 880px даёт около 100 знаков в строке — для трёх длинных абзацев
+   это много, глаз теряет начало следующей строки. Ограничиваем меру примерно
+   до 72 знаков. Значение в ch подобрано замером, а не на глаз: единица ch
+   равна ширине цифры, а она заметно шире средней строчной буквы, поэтому
+   74ch давали не 74 знака, а 90. */
+.bdg-legal p{
+  font-size:var(--t-legal);line-height:1.75;color:var(--muted);
+  margin-top:var(--s4);max-width:59ch;
 }
-.bdg-legal p{font-size:var(--t-legal);line-height:1.7;color:var(--muted);margin-top:var(--s2);}
-.bdg-legal p.bdg-strong{color:var(--text);font-weight:600;}
-.bdg-legal ol,.bdg-legal ul{margin-top:var(--s2);}
-.bdg-legal ol li,.bdg-legal ul li{
-  position:relative;padding:7px 0 7px 26px;font-size:var(--t-legal);line-height:1.6;color:var(--muted);
-}
-.bdg-legal ol{counter-reset:legal;}
-.bdg-legal ol li::before{
-  counter-increment:legal;content:counter(legal) ".";
-  position:absolute;left:0;top:7px;color:var(--brass-lit);font-weight:700;
-  font-variant-numeric:tabular-nums;
-}
-.bdg-legal ul li::before{content:"";position:absolute;left:0;top:17px;width:10px;height:1px;background:var(--brass);}
-.bdg-legal .bdg-feelist{columns:2;column-gap:40px;}
-.bdg-legal .bdg-feelist li{break-inside:avoid;}
 
 /* ---------- 6. Close ------------------------------------------------------ */
 .bdg-close{
@@ -381,7 +365,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
    -------------------------------------------------------------------------- */
 @media (max-width:1180px){
   .bdg-herogrid{gap:var(--s5);}
-  .bdg-legal .bdg-feelist{column-gap:var(--s5);}
 }
 @media (max-width:900px){
   .bdg{--s8:64px;--pad-card:24px;}
@@ -408,7 +391,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
-  .bdg-legal .bdg-feelist{columns:1;}
   /* на узком экране ряд разворачивается в столбик, ширина остаётся общей */
   .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
 }
@@ -419,7 +401,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
      иначе слово вылезает за свою колонку */
   .bdg-hero h1{font-size:26px;}
   .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.5fr);gap:var(--s3);}
-  .bdg-legal ol li,.bdg-legal ul li{padding-left:20px;}
 }
 @media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
 </style>
@@ -478,119 +459,13 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
 <!-- 5. Terms and Conditions -->
 <section class="bdg-legal" id="rebate-terms">
   <div class="bdg-wrap">
-    <div class="bdg-ack">
-      <h3>Customer Acknowledgement:</h3>
-      <p>By redeeming this rebate, the customer acknowledges and agrees to the Backdraft Suppressors Free Suppressor Rebate Terms and Conditions below, including all items marked with an asterisk above. The customer understands that the rebate applies to the eligible suppressor only and does not include the HUB Adapter, shipping/handling, applicable taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT transfer fees, or any other required fees. The customer further understands that the estimated 8&ndash;12 week lead time is not guaranteed and may be extended without notice.</p>
-    </div>
+    <h2>Terms &amp; Conditions</h2>
 
-    <p class="bdg-label">The fine print</p>
-    <p class="bdg-doctitle">Backdraft Suppressors Free Suppressor Rebate &mdash; Customer Acknowledgement of Required Rebate Terms</p>
-    <h2>Terms and Conditions</h2>
+    <p>By redeeming the Free Suppressor Rebate, the customer acknowledges and agrees to these Terms and Conditions. Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor. Where available, the rebate may be applied toward an eligible suppressor upgrade, with the customer responsible for any price difference. The rebate applies to the suppressor only and does not include the required HUB Adapter, shipping or handling, taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT fees, dealer fees, or any other applicable charges. All products, configurations, finishes, calibers, and upgrade options are subject to availability. Rebate codes have no cash value and may not be duplicated, altered, or fraudulently generated. Codes may be transferred or gifted to another eligible person but may not be combined with other discounts or promotions unless expressly authorized.</p>
 
-    <div class="bdg-legalintro">
-      <p>The <strong>Backdraft Suppressors Free Suppressor Rebate</strong> allows eligible customers to redeem a qualifying rebate code toward one eligible 4&Prime; Hunter Suppressor, non-magnum only, through BackdraftSuppressors.com, subject to these Terms and Conditions, product availability, legal eligibility, and all applicable federal, state, and local laws.</p>
-      <p>The rebate may be received through various qualifying sources, including but not limited to eligible purchases from GetOutlier.com, participating dealers, promotional offers, product bundles, rebate cards, order inserts, digital codes, or other approved promotional channels. Regardless of how the rebate code is received, the rebate terms remain the same.</p>
-    </div>
+    <p>The customer is responsible for ensuring they are legally eligible to purchase, possess, and receive a suppressor and for complying with all applicable federal, state, and local laws. Suppressors must be transferred through a qualified FFL/SOT, and the customer is responsible for selecting the FFL/SOT and paying all associated transfer, processing, storage, tax, and other third-party fees. A compatible HUB Adapter is required and must be purchased separately; the customer is responsible for confirming compatibility with their firearm and intended setup. This promotion is available only where suppressors are legal and is void where prohibited or restricted by law. Redemption of a rebate code does not guarantee eligibility or completion of a transfer. In the event of a returned or cancelled qualifying purchase, chargeback, fraudulent or unauthorized use, ineligibility, or violation of these terms, Backdraft Suppressors reserves the right to void or cancel the rebate, redemption, or order and recover the promotional value where applicable.</p>
 
-    <h3>Important Customer Responsibility Notice</h3>
-    <p class="bdg-strong">The rebate applies to the eligible suppressor only.</p>
-    <p>The HUB Adapter is not included. Shipping/handling is not included. Applicable taxes are not included. Transfer fees are not included. Any ATF, NFA, FFL, SOT, state, local, sales tax, transfer tax, or other required fees are the responsibility of the customer.</p>
-    <p>By redeeming a rebate code, the customer acknowledges and agrees that additional charges may be due at checkout and/or through the selected FFL/SOT dealer before the suppressor can be legally transferred.</p>
-
-    <h3>Eligible Rebate Item</h3>
-    <p>Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor, non-magnum only.</p>
-    <p>The stated rebate value is <strong>$189.99</strong>. Customers may apply the rebate value toward an eligible upgrade or alternate suppressor option where available, and the customer is responsible for paying any difference in price, along with all required accessories, shipping/handling, taxes, transfer-related fees, and any other applicable charges.</p>
-    <p>All models, calibers, finishes, configurations, and upgrade options are subject to availability.</p>
-
-    <h3>Rebate Code Use</h3>
-    <p>Each rebate code is valid for one suppressor redemption only. There is no limit on the number of rebate codes a customer may redeem, provided each rebate code is valid, unused, and redeemed according to these Terms and Conditions.</p>
-    <p>For example, if a customer has multiple valid rebate codes, each code may be redeemed separately for one eligible suppressor per code.</p>
-    <p>Rebate codes may be transferred or gifted to another eligible person. Rebate codes may not be fraudulently generated, duplicated, altered, counterfeited, or used in any unauthorized manner.</p>
-    <p>Rebate codes have no cash value and may not be redeemed for cash, store credit, refund, or any monetary payment.</p>
-
-    <h3>Rebate Expiration</h3>
-    <p>Each rebate code is valid for <strong>one year from the date it is received or issued</strong>, unless a different expiration date is printed, displayed, assigned, or otherwise communicated with the rebate code.</p>
-    <p>Expired rebate codes are void and will not be honored.</p>
-
-    <h3>How to Redeem</h3>
-    <p>To redeem a valid rebate code, the customer must:</p>
-    <ol>
-      <li>Visit BackdraftSuppressors.com.</li>
-      <li>Select an eligible 4&Prime; Hunter Suppressor, non-magnum only, or eligible upgrade where available.</li>
-      <li>Add the required HUB Adapter.</li>
-      <li>Enter the rebate code at checkout.</li>
-      <li>Pay all required charges, including any upgrade cost, HUB Adapter, shipping/handling, taxes, transfer-related fees, and any other applicable charges.</li>
-      <li>Complete all required FFL/SOT, ATF/NFA, federal, state, and local transfer requirements.</li>
-    </ol>
-    <p>Incomplete redemptions, invalid codes, expired codes, duplicate codes, or redemptions that do not comply with these Terms and Conditions may be denied, cancelled, or voided.</p>
-
-    <h3>Required HUB Adapter</h3>
-    <p class="bdg-strong">A compatible HUB Adapter is required and is not included in the free suppressor rebate.</p>
-    <p>The customer is responsible for selecting and purchasing the appropriate HUB Adapter for their suppressor, firearm, barrel threading, and intended setup. Customers should verify compatibility before completing their order, installing the adapter, or using the suppressor.</p>
-
-    <h3>Customer Fees, Taxes, and Transfer Costs</h3>
-    <p class="bdg-strong">The customer is responsible for all charges not expressly included in the rebate.</p>
-    <p>These may include, but are not limited to:</p>
-    <ul class="bdg-feelist">
-      <li>HUB Adapter cost</li>
-      <li>Shipping and handling</li>
-      <li>Sales tax</li>
-      <li>State or local taxes</li>
-      <li>Transfer taxes, where applicable</li>
-      <li>ATF/NFA-related fees, where applicable</li>
-      <li>FFL/SOT transfer fees</li>
-      <li>Dealer processing fees</li>
-      <li>Storage fees</li>
-      <li>Any other transfer-related, governmental, or third-party fees</li>
-    </ul>
-    <p>Taxes and fees may be calculated based on the full value of the suppressor, the HUB Adapter, any upgraded item, and/or any other products included in the order.</p>
-    <p>Fees charged by a receiving FFL/SOT or other third party are separate from BackdraftSuppressors.com and remain the sole responsibility of the customer.</p>
-
-    <h3>FFL/SOT Transfer Process</h3>
-    <p class="bdg-strong">Suppressors are regulated items and must be transferred in accordance with all applicable laws.</p>
-    <p>Outlier USA / Backdraft Suppressors will transfer the suppressor to the customer&rsquo;s selected FFL/SOT through the required transfer process. The customer is responsible for selecting a qualified FFL/SOT and completing all required transfer paperwork, approvals, background checks, tax payments, fees, and legal requirements necessary to receive the suppressor.</p>
-    <p>The customer is responsible for all fees charged by the selected FFL/SOT, including any transfer, processing, storage, or administrative fees.</p>
-    <p>Redemption of a rebate code does not guarantee that the customer is legally eligible to receive or possess a suppressor. If the customer is not legally eligible, if the selected FFL/SOT cannot complete the transfer, or if the transfer is prohibited by law, the redemption may be cancelled or denied.</p>
-
-    <h3>Lead Time and Fulfillment</h3>
-    <p class="bdg-strong">The current estimated lead time is 8&ndash;12 weeks after checkout and payment are completed.</p>
-    <p>This timeline is an estimate only and is not a guaranteed delivery date, shipping date, transfer date, or approval date. Due to demand, production volume, supplier delays, regulatory transfer requirements, FFL/SOT processing, ATF/NFA processing, carrier delays, or other operational factors, lead times may be extended automatically without notice.</p>
-    <p>Customers acknowledge that Outlier USA / Backdraft Suppressors is currently experiencing extended fulfillment timelines and that actual delivery or transfer may take longer than the estimated 8&ndash;12 week period.</p>
-    <p>Customer updates may be limited during the production and transfer process. Customers should expect to receive an order confirmation and a shipping notification when the item ships to the selected FFL/SOT.</p>
-
-    <h3>Availability and Substitutions</h3>
-    <p>All suppressors, accessories, HUB Adapters, finishes, calibers, configurations, and upgrade options are subject to availability.</p>
-    <p>Outlier USA and Backdraft Suppressors reserve the right to modify, substitute, delay, discontinue, or replace any promotional item with an item of equal or greater value if necessary due to inventory, production, regulatory, supplier, or operational considerations.</p>
-    <p>Product images, descriptions, finishes, and promotional materials are for general reference and may vary from the final product received.</p>
-
-    <h3>No Stacking or Cash Redemption</h3>
-    <p>Unless expressly permitted in writing by Outlier USA / Backdraft Suppressors, rebate codes may not be combined with other rebates, discounts, coupons, credits, promotional offers, dealer offers, or special pricing.</p>
-    <p>Rebate codes are not redeemable for cash, credit, refund, or any monetary value.</p>
-
-    <h3>Returns, Cancellations, and Refunds</h3>
-    <p>Due to the regulated nature of suppressors and the ATF/NFA transfer process, suppressors are not eligible for return, exchange, or refund once the order, production, shipment, transfer, or paperwork process has begun, except where expressly required by law.</p>
-    <p>If a qualifying purchase that resulted in the issuance of a rebate code is returned, cancelled, charged back, refunded, or otherwise reversed, Outlier USA / Backdraft Suppressors may cancel the related rebate code, void the redemption, reduce any refund by the rebate value, or seek recovery of the promotional value received.</p>
-    <p>If a rebate has already been redeemed, the customer may be responsible for the rebate value, related charges, fees, costs, or any other amounts associated with the redemption.</p>
-
-    <h3>Eligibility and Legal Compliance</h3>
-    <p>This promotion is available only to eligible U.S. customers located in jurisdictions where suppressors are legal.</p>
-    <p>This promotion is not available in Alaska, in any state or jurisdiction where suppressors are prohibited, or where the promotion is otherwise restricted, taxed in a way that makes the promotion unavailable, or prohibited by law.</p>
-    <p class="bdg-strong">Void where prohibited, restricted, or otherwise unavailable by federal, state, or local law.</p>
-    <p>It is the customer&rsquo;s sole responsibility to understand and comply with all applicable federal, state, and local laws before redeeming a rebate code, purchasing a HUB Adapter, selecting an FFL/SOT, or attempting to receive a suppressor.</p>
-
-    <h3>Misuse, Fraud, and Revocation</h3>
-    <p>Outlier USA and Backdraft Suppressors reserve the right to deny, cancel, suspend, revoke, or void any rebate code, redemption, order, or promotion for any reason, including but not limited to suspected misuse, fraud, duplicate redemption, unauthorized code generation, code alteration, resale abuse, ineligibility, chargebacks, returned qualifying purchases, violation of these Terms and Conditions, or violation of applicable law.</p>
-    <p>Remedies may include cancellation of orders, voiding of rebate codes, denial of redemption, reduced refunds, suspension of account privileges, and any other legal, contractual, or equitable remedies available.</p>
-
-    <h3>Program Changes</h3>
-    <p>Outlier USA and Backdraft Suppressors reserve the right to modify, suspend, extend, or terminate the Backdraft Suppressors Free Suppressor Rebate program at any time without prior notice.</p>
-    <p>Changes may include, but are not limited to, rebate value, eligible products, upgrade options, redemption process, expiration rules, lead times, fulfillment process, available inventory, required accessories, fees, or these Terms and Conditions.</p>
-
-    <h3>Errors and Technical Issues</h3>
-    <p>Outlier USA and Backdraft Suppressors are not responsible for typographical errors, pricing errors, image errors, technical issues, website errors, checkout errors, unavailable network connections, interrupted service, incorrect customer information, invalid FFL/SOT information, shipping carrier delays, or third-party processing issues.</p>
-
-    <h3>Severability</h3>
-    <p>If any provision of these Terms and Conditions is found to be invalid, unlawful, or unenforceable, the remaining provisions will remain in full force and effect.</p>
+    <p>Due to the regulated nature of suppressors, orders may not be eligible for cancellation, return, exchange, or refund after shipment, transfer, or required paperwork has begun, except where required by law. Backdraft Suppressors reserves the right to modify, suspend, extend, or terminate this promotion, change eligible products or requirements, substitute products of equal or greater value when necessary, or deny or revoke any redemption involving misuse, fraud, error, ineligibility, or violation of these Terms and Conditions. All redemptions are subject to product availability and applicable law.</p>
   </div>
 </section>
 
