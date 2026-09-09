@@ -27,8 +27,7 @@ HERE = pathlib.Path(__file__).parent
 PAGE = HERE / "page.src.html"
 POSTER_MAP = HERE / "assets" / "poster-map.json"
 LINK_MARKER = "<!--poster-links-->"
-HEAD_MARKER = "POSTER_HEAD_RATIO"
-HEAD_WIDTH_MARKER = "POSTER_HEAD_WIDTH"
+
 
 PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 <style>
@@ -44,35 +43,18 @@ PREVIEW_FOOT = '<div class="mock-footer">&copy; 2026 Backdraft Suppressors &mdas
 def poster(page: str) -> str:
     """Подставить всё, что зависит от раскладки инфографики.
 
-    Карту пишет poster_layout.py при сборке картинки: доли рамок клика, высоту
-    шапки для обрезки на узком экране и сам текст шагов. Текст сверяется с живым
-    списком на странице — он показывается вместо картинки на узких экранах,
-    и разъехаться эти два набора не должны.
+    Карту пишет poster_layout.py при сборке картинки. Страница ничего не
+    подменяет на узких экранах: инфографика показывается целиком и просто
+    уменьшается, поэтому нужны только доли рамок клика — они в долях и едут
+    вместе с картинкой на любой ширине.
     """
     if page.count(LINK_MARKER) != 1:
         raise SystemExit(f"{LINK_MARKER} must appear exactly once in page.src.html")
-    for marker in (HEAD_MARKER, HEAD_WIDTH_MARKER):
-        if page.count(marker) != 1:
-            raise SystemExit(f"{marker} must appear exactly once in page.src.html")
     m = json.loads(POSTER_MAP.read_text(encoding="utf-8"))
     spots = m["links"]
     if not spots:
         raise SystemExit("poster-map.json has no links — run tools-cutout.py first")
 
-    live = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", li))).strip()
-            for li in re.findall(r"<li><p>(.*?)</p></li>", page, re.S)]
-    baked = [s.replace("\u2033", '"') for s in m["steps"]]
-    live_cmp = [s.replace("\u2033", '"') for s in live]
-    if live_cmp != baked:
-        pairs = [f"\n  картинка: {b}\n  страница: {l}"
-                 for b, l in zip(baked, live_cmp + [""] * len(baked)) if b != l]
-        raise SystemExit("шаги на странице разошлись с шагами в картинке:" + "".join(pairs))
-
-    head = m["head"]
-    page = page.replace(HEAD_MARKER, f'{head["w"]}/{head["h"]}')
-    # картинка шире контейнера ровно настолько, чтобы правая часть с рендером
-    # ушла за край: контейнер её обрезает
-    page = page.replace(HEAD_WIDTH_MARKER, f'{head["w"] / head["right"] * 100:.3f}%')
     tags = "\n".join(
         '      <a class="bdg-hot" href="{href}" aria-label="{label}"'
         ' style="left:{left}%;top:{top}%;width:{width}%;height:{height}%"></a>'.format(
@@ -81,7 +63,7 @@ def poster(page: str) -> str:
         for s in spots)
     print(f"  {len(spots)} ссылок поверх инфографики: "
           + ", ".join(s["label"] for s in spots)
-          + f"; шаги на странице сверены с картинкой ({len(baked)})")
+          + ")")
     return page.replace(LINK_MARKER, tags.strip())
 
 
