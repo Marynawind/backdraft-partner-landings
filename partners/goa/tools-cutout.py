@@ -22,7 +22,7 @@ poster is squeezed to the width the layout actually uses.
 
 Needs Pillow. Run from partners/goa:  python3 tools-cutout.py
 """
-from PIL import Image
+from PIL import Image, ImageDraw
 import pathlib
 
 FLOOR = 24      # brightness at or below this is backdrop, not ink
@@ -40,14 +40,18 @@ REEL = ["step-1-visit", "step-3-hub-adapter", "step-4-rebate-code"]
 NAMES = [HERO] + REEL
 REEL_W, REEL_Q, REEL_AQ = 440, 80, 70
 
-# От инфографики на странице осталась только одна её часть — рендер глушителя
-# справа. Шаги и мелкие иконки заменены живым текстом, поэтому вся картинка
-# целиком больше не нужна: она весила 89 КБ после base64 и на телефоне
-# не читалась. Вырезаем объект по замеренной рамке.
+# Инфографика идёт целиком, но четыре карточки с шагами из неё стёрты: те же
+# шаги теперь живым текстом под картинкой, растром они не читались на телефоне
+# и не попадали в поиск. Рамка стирания снята замером: карточки заканчиваются
+# на x≈1080, дальше чистый зазор, рендер глушителя начинается с x≈1200.
+# Заливаем чёрным — после блендинга screen это ровно фон страницы.
 POSTER = "redemption-infographic"
-POSTER_CROP = (944, 140, 1484, 1012)   # рамка объекта плюс поля
-POSTER_W = 640    # показывается максимум на ~420 px, это двойная плотность
-POSTER_Q = 86
+# Рамка снята замером: цифры карточек начинаются с y≈522 (выше них декоративная
+# линейка под подзаголовком — её сохраняем), слева контент с x≈80, справа
+# карточки кончаются на x≈1080, дальше чистый зазор до рендера с x≈1200.
+POSTER_CARDS = (70, 522, 1088, 890)    # зона карточек, стирается
+POSTER_W = 1300   # колонка контента не шире 1112 px
+POSTER_Q = 82
 POSTER_BLACK = 16 # чёрная точка, см. ниже
 
 
@@ -104,10 +108,11 @@ if __name__ == "__main__":
     # (see .bdg-poster). Screen only cancels the ground exactly where the ground
     # is exactly black, so the black point is pulled down here first: without it
     # the poster keeps a faintly lighter rectangle over the page gradient.
-    src, dst = SRC / f"{POSTER}.webp", OUT / "hero-suppressor.webp"
-    im = Image.open(src).convert("RGB").crop(POSTER_CROP)
+    src, dst = SRC / f"{POSTER}.webp", OUT / f"{POSTER}.webp"
+    im = Image.open(src).convert("RGB")
+    ImageDraw.Draw(im).rectangle(POSTER_CARDS, fill=(0, 0, 0))
     im = im.resize((POSTER_W, round(POSTER_W * im.size[1] / im.size[0])), Image.LANCZOS)
     scale = 255 / (255 - POSTER_BLACK)
     im = im.point(lambda v: min(255, round((v - POSTER_BLACK) * scale)) if v > POSTER_BLACK else 0)
     im.save(dst, "WEBP", quality=POSTER_Q, method=6)
-    print(f"{'hero-suppressor':22} вырезан из {POSTER} -> {dst.stat().st_size/1024:5.1f} KB   {im.size[0]}x{im.size[1]}, чёрная точка {POSTER_BLACK}")
+    print(f"{POSTER:22} {src.stat().st_size/1024:5.1f} KB -> {dst.stat().st_size/1024:5.1f} KB   {im.size[0]}x{im.size[1]}, карточки стёрты")

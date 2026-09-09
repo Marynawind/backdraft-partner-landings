@@ -286,19 +286,17 @@
 /* Шаги — живым текстом, а не картинкой. Инфографика несла те же сведения
    растром: на телефоне её мелкий шрифт не читался, в поиск и скринридер она
    попадала только через alt, и весила 89 КБ после base64.
-   От картинки оставлен сам рендер глушителя — он справа от шагов. */
-.bdg-stepsgrid{
-  margin-top:var(--s5);display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,.42fr);
-  gap:var(--s6);align-items:center;
-}
-/* Рендер лежит на собственном чёрном фоне. Вырезать его нельзя — это фото
+   Сама инфографика осталась, но четыре карточки с шагами из неё стёрты
+   (tools-cutout.py): дублировать шаги растром незачем.
+
+   Картинка лежит на собственном чёрном фоне. Вырезать его нельзя — это фото
    тёмного объекта, порог съел бы половину. Поэтому фон гасится блендингом:
    screen против строго чёрного возвращает подложку нетронутой, а чёрная точка
-   у файла опущена заранее (tools-cutout.py), иначе остался бы светлый
-   прямоугольник. Цена приёма: никаких transform на родителях. */
-.bdg-stepart img{display:block;width:100%;height:auto;mix-blend-mode:screen;}
-ol.bdg-steplist{display:grid;gap:0;counter-reset:step;}
+   у файла опущена заранее, иначе остался бы светлый прямоугольник.
+   Цена приёма: никаких transform на родителях. */
+figure.bdg-poster{margin-top:var(--s5);}
+.bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
+ol.bdg-steplist{margin-top:var(--s5);display:grid;gap:0;counter-reset:step;}
 .bdg-steplist li{
   display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
   align-items:baseline;padding:var(--s3) 0;border-top:1px solid var(--line-soft);
@@ -413,11 +411,6 @@ ol.bdg-steplist{display:grid;gap:0;counter-reset:step;}
      работает как иллюстрация. */
   .bdg{--t-label:13px;}
 }
-@media (max-width:860px){
-  /* на узком экране рендер уходит под шаги и сжимается */
-  .bdg-stepsgrid{grid-template-columns:1fr;gap:var(--s4);}
-  .bdg-stepart{max-width:230px;margin:0 auto;}
-}
 @media (max-width:620px){
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
      поэтому на узких экранах ограничиваем её отдельно от десктопных 300px */
@@ -471,7 +464,10 @@ ol.bdg-steplist{display:grid;gap:0;counter-reset:step;}
     <h2>How to Redeem Your <em>Rebate</em></h2>
     <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor:</p>
 
-    <div class="bdg-stepsgrid">
+    <figure class="bdg-poster">
+      <img src="assets/redemption-infographic.webp" width="1300" height="867" alt="Backdraft Suppressors — How to redeem your free suppressor rebate" loading="lazy">
+    </figure>
+
     <ol class="bdg-steplist">
       <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>
       <li><p>Select a <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter</a>, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost.</p></li>
@@ -480,10 +476,6 @@ ol.bdg-steplist{display:grid;gap:0;counter-reset:step;}
       <li><p>Select your preferred FFL/SOT for suppressor transfer.</p></li>
       <li><p>Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.</p></li>
     </ol>
-      <figure class="bdg-stepart">
-        <img src="assets/hero-suppressor.webp" width="640" height="1033" alt="Outlier 4&Prime; Hunter suppressor, BH4 6.5 mm" loading="lazy">
-      </figure>
-    </div>
 
     <div class="bdg-notecard">
       <h2><span class="bdg-ast">*</span>Please note:</h2>
