@@ -86,7 +86,7 @@ def sized(path: pathlib.Path, cap: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(path), round(400 * cap * SS / (b[3] - b[1])))
 
 
-def wrap(text: str, font: ImageFont.FreeTypeFont, width: int) -> list[str]:
+def greedy(text: str, font: ImageFont.FreeTypeFont, width: int) -> list[str]:
     lines, cur = [], ""
     for word in text.split():
         trial = f"{cur} {word}".strip()
@@ -98,6 +98,27 @@ def wrap(text: str, font: ImageFont.FreeTypeFont, width: int) -> list[str]:
     if cur:
         lines.append(cur)
     return lines
+
+
+def wrap(text: str, font: ImageFont.FreeTypeFont, width: int) -> list[str]:
+    """Перенос с выравниванием строк по длине.
+
+    Жадный перенос набивает первую строку под завязку и оставляет в хвосте
+    одно слово — «cost.» отдельной строкой. Поэтому после жадного прохода
+    ищем самую узкую ширину, которая ещё укладывается в то же число строк:
+    число строк не растёт, а длина у них выравнивается и висячих слов нет.
+    """
+    lines = greedy(text, font, width)
+    if len(lines) < 2:
+        return lines
+    lo, hi = max(font.getlength(w) for w in text.split()) / SS, width
+    while hi - lo > 1:
+        mid = (lo + hi) / 2
+        if len(greedy(text, font, mid)) <= len(lines):
+            hi = mid
+        else:
+            lo = mid
+    return greedy(text, font, hi)
 
 
 def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
