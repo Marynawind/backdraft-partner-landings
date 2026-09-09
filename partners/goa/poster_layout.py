@@ -79,6 +79,23 @@ ICON_SRC = {                       # откуда режем иконки, за�
 }
 ERASE = (76, 508, 1142, 1012)      # карточки Outlier и прежняя плашка сноски
 
+# Рендер глушителя стоял в верхней трети и висел над выросшей колонкой текста.
+# Опускаем его так, чтобы низ тени встал вровень с низом полосы. Полоса реза
+# выбрана замером: между звёздочкой заголовка (кончается на x≈1165) и рендером
+# (начинается с x≈1196) идёт чистый коридор, в столбцах 1170..1195 нет ни одного
+# пикселя ярче 51. Освободившийся верх заполняется фоном самой полосы — он там
+# ровный, медиана 7-9 из 255.
+RENDER_X = 1172
+RENDER_BOTTOM = 1005               # низ тени рендера в исходнике
+
+# Подпись под заголовком клиент поправил: убрал «free» и поставил двоеточие.
+# Строка внутри растра, поэтому стирается и набирается заново. Замер исходной:
+# чернила с x=89, базовая линия на y=454, высота прописной 22 px; сверху и снизу
+# чисто (заголовок кончается на 405, декоративная линейка начинается с 485).
+SUBTITLE = 'Use your rebate code at checkout to redeem your 4" Hunter suppressor:'
+SUB_BOX = (80, 425, 1160, 470)     # что стереть
+SUB_X, SUB_BASE, SUB_CAP = 89, 454, 22
+
 
 def sized(path: pathlib.Path, cap: int) -> ImageFont.FreeTypeFont:
     """Шрифт кеглем под заданную высоту прописной — в пикселях исходника×SS."""
@@ -127,6 +144,8 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
     f_step, f_num = sized(REG, STEP_CAP), sized(BOLD, NUM_CAP)
     f_head, f_body = sized(BOLD, STRIP_CAP), sized(REG, STRIP_CAP)
 
+    band = poster.crop((RENDER_X, 0, poster.width, poster.height))   # снимаем до роста холста
+
     icons = {}
     for key, (where, box) in ICON_SRC.items():
         img = (strip_src if where == "strip" else poster).crop(box)
@@ -151,13 +170,25 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
     draw = ImageDraw.Draw(poster)
     draw.rectangle((ERASE[0], ERASE[1], ERASE[2], poster.height), fill=(0, 0, 0))
 
+    # рендер опускаем к низу текстовой колонки
+    drop = poster.height - BOTTOM - RENDER_BOTTOM
+    if drop > 0:
+        tile = band.crop((0, 0, band.width, 60))
+        for ty in range(0, poster.height, tile.height):
+            poster.paste(tile, (RENDER_X, ty))
+        poster.paste(band, (RENDER_X, drop))
+
     # текст рисуем на отдельном слое в SS раз крупнее и уменьшаем: так мелкий
     # кегль выходит мягким, как набранный, а не ступенчатым
     layer = Image.new("RGB", (poster.width * SS, poster.height * SS), (0, 0, 0))
     ink = ImageDraw.Draw(layer)
 
-    def put(x, y, text, font, fill):
-        ink.text((x * SS, y * SS), text, font=font, fill=fill, anchor="lt")
+    def put(x, y, text, font, fill, anchor="lt"):
+        ink.text((x * SS, y * SS), text, font=font, fill=fill, anchor=anchor)
+
+    # подпись под заголовком — по исходной базовой линии, а не по верху строки
+    draw.rectangle(SUB_BOX, fill=(0, 0, 0))
+    put(SUB_X, SUB_BASE, SUBTITLE, sized(REG, SUB_CAP), INK, anchor="ls")
 
     y = ZONE_TOP
     for i, step in enumerate(STEPS, 1):
@@ -202,13 +233,13 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
 
     layer = layer.resize(poster.size, Image.LANCZOS)
     px, lp = poster.load(), layer.load()
-    for yy in range(ZONE_TOP - 4, poster.height):
-        for xx in range(x0, x1 + 1):
+    for yy in range(SUB_BOX[1], poster.height):
+        for xx in range(SUB_BOX[0], SUB_BOX[2] + 1):
             s = lp[xx, yy]
             if s[0] or s[1] or s[2]:
                 d = px[xx, yy]
                 px[xx, yy] = tuple(255 - (255 - d[i]) * (255 - s[i]) // 255 for i in range(3))
     print(f"  холст {poster.width}x{poster.height}, шаги {ZONE_TOP}..{steps_bottom},"
           f" полоса {box_y}..{box_y + box_h - 1}, зазор {box_y - steps_bottom} px,"
-          f" текст с x={TEXT_X} в обоих блоках")
+          f" текст с x={TEXT_X} в обоих блоках, рендер опущен на {drop} px")
     return poster
