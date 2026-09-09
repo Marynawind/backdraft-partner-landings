@@ -432,15 +432,29 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
   .bdg{--s8:48px;--s6:32px;--t-body:18px;--t-lead:20px;--t-micro:15px;--t-legal:18px;}
   .bdg-legal p{max-width:none;}
   .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
+  /* Иллюстрация держала 38% ширины, и на кнопки в шапке оставалось 206 px —
+     надпись ломалась на две строки. Долю урезаем, картинка просто мельче. */
+  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.42fr);}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
-  /* на узком экране ряд разворачивается в столбик, ширина остаётся общей */
+}
+@media (max-width:900px){
+  /* Шапка остаётся в две колонки на всех ширинах, поэтому колонка с текстом
+     здесь уже узкая: два ряда кнопок в ней ломают надписи на три строки.
+     Разворачиваем ряд в столбик — ширина у кнопок остаётся общей. */
   .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
 }
 @media (max-width:700px){
   /* картинка обрезается до шапки: остальное её содержимое ниже живым текстом */
-  .bdg-poster img{aspect-ratio:1536/420;object-fit:cover;object-position:center top;}
+  /* Картинка обрезается по обеим осям: по вертикали до заголовка, по горизонтали
+     до правого края заголовка — иначе сбоку торчит обрубок рендера глушителя.
+     Обе величины подставляет build.py из poster-map.json. */
+  figure.bdg-poster{overflow:hidden;}
+  .bdg-poster img{
+    width:130.169%;max-width:none;
+    aspect-ratio:1536/420;object-fit:cover;object-position:left top;
+  }
   /* области клика считаны от полной картинки и на обрезанной не совпадут,
      а живой текст ниже несёт те же ссылки настоящими */
   .bdg-hot{display:none;}
@@ -454,7 +468,7 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
      на самом узком экране кегль и доля колонки под картинку идут вниз —
      иначе слово вылезает за свою колонку */
   .bdg-hero h1{font-size:26px;}
-  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.5fr);gap:var(--s3);}
+  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.34fr);gap:var(--s3);}
 }
 @media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
 </style>

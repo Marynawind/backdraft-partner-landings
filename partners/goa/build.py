@@ -28,6 +28,7 @@ PAGE = HERE / "page.src.html"
 POSTER_MAP = HERE / "assets" / "poster-map.json"
 LINK_MARKER = "<!--poster-links-->"
 HEAD_MARKER = "POSTER_HEAD_RATIO"
+HEAD_WIDTH_MARKER = "POSTER_HEAD_WIDTH"
 
 PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 <style>
@@ -50,8 +51,9 @@ def poster(page: str) -> str:
     """
     if page.count(LINK_MARKER) != 1:
         raise SystemExit(f"{LINK_MARKER} must appear exactly once in page.src.html")
-    if page.count(HEAD_MARKER) != 1:
-        raise SystemExit(f"{HEAD_MARKER} must appear exactly once in page.src.html")
+    for marker in (HEAD_MARKER, HEAD_WIDTH_MARKER):
+        if page.count(marker) != 1:
+            raise SystemExit(f"{marker} must appear exactly once in page.src.html")
     m = json.loads(POSTER_MAP.read_text(encoding="utf-8"))
     spots = m["links"]
     if not spots:
@@ -66,7 +68,11 @@ def poster(page: str) -> str:
                  for b, l in zip(baked, live_cmp + [""] * len(baked)) if b != l]
         raise SystemExit("шаги на странице разошлись с шагами в картинке:" + "".join(pairs))
 
-    page = page.replace(HEAD_MARKER, f'{m["head"]["w"]}/{m["head"]["h"]}')
+    head = m["head"]
+    page = page.replace(HEAD_MARKER, f'{head["w"]}/{head["h"]}')
+    # картинка шире контейнера ровно настолько, чтобы правая часть с рендером
+    # ушла за край: контейнер её обрезает
+    page = page.replace(HEAD_WIDTH_MARKER, f'{head["w"] / head["right"] * 100:.3f}%')
     tags = "\n".join(
         '      <a class="bdg-hot" href="{href}" aria-label="{label}"'
         ' style="left:{left}%;top:{top}%;width:{width}%;height:{height}%"></a>'.format(
