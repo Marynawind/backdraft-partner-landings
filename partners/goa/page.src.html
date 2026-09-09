@@ -272,23 +272,6 @@
 }
 
 /* ---------- 2. Rebate at a glance ---------------------------------------- */
-/* Строка фактов, а не плита. Своя подложка делала из этой полосы светлый
-   блок поперёк страницы и разрывала сквозной градиент; разделяют колонки
-   тонкие волоски, а не рамки ячеек.
-   Подписи здесь — .bdg-fine, а НЕ .bdg-note: секция ниже по странице носит
-   класс .bdg-note и раздавала этим спанам свой padding 80/84px, раздувая
-   ячейку до 326px. Имя менять нельзя. */
-.bdg-specs{padding:var(--s5) 0;border-bottom:1px solid var(--line-soft);}
-.bdg-specs ul{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);}
-.bdg-specs li{padding-left:var(--s4);border-left:1px solid var(--line-soft);}
-.bdg-specs li:first-child{padding-left:0;border-left:0;}
-.bdg-specs .bdg-label{display:block;}
-.bdg-specs .bdg-val{
-  display:block;font-size:clamp(19px,1.7vw,24px);font-weight:700;letter-spacing:-.015em;
-  color:var(--text);margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.2;
-}
-.bdg-specs .bdg-val em{font-style:normal;color:var(--brass-lit);font-weight:800;}
-.bdg-specs .bdg-fine{display:block;font-size:var(--t-micro);color:var(--muted);margin-top:5px;line-height:1.5;}
 
 /* ---------- 3. How to Redeem --------------------------------------------- */
 .bdg-steps{background:var(--recess);}
@@ -396,10 +379,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
   .bdg-herogrid{gap:var(--s5);}
   .bdg-legal .bdg-feelist{column-gap:var(--s5);}
 }
-@media (max-width:1024px){
-  .bdg-specs ul{grid-template-columns:repeat(2,1fr);row-gap:var(--s4);}
-  .bdg-specs li:nth-child(3){padding-left:0;border-left:0;}
-}
 @media (max-width:900px){
   .bdg{--s8:64px;--pad-card:24px;}
   /* Шапка НЕ перестраивается на узких экранах: иллюстрация остаётся справа
@@ -424,8 +403,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
   .bdg{--s8:48px;--s6:32px;--t-label:13px;}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
-  .bdg-specs ul{grid-template-columns:1fr;row-gap:var(--s3);}
-  .bdg-specs li{padding-left:0;border-left:0;}
   .bdg-ready{gap:var(--s3);}
   .bdg-legal .bdg-feelist{columns:1;}
   /* на узком экране ряд разворачивается в столбик, ширина остаётся общей */
@@ -464,34 +441,6 @@ figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
         <span class="bdg-art"></span>
       </figure>
     </div>
-  </div>
-</section>
-
-<!-- 2. Rebate at a glance -->
-<section class="bdg-specs" aria-label="Rebate at a glance">
-  <div class="bdg-wrap">
-    <ul>
-      <li>
-        <span class="bdg-label">Rebate value</span>
-        <span class="bdg-val"><em>$189.99</em></span>
-        <span class="bdg-fine">Applied toward the eligible suppressor</span>
-      </li>
-      <li>
-        <span class="bdg-label">Eligible suppressor</span>
-        <span class="bdg-val">4&Prime; Hunter</span>
-        <span class="bdg-fine">Non-magnum only</span>
-      </li>
-      <li>
-        <span class="bdg-label">Estimated lead time</span>
-        <span class="bdg-val">8&ndash;12 weeks</span>
-        <span class="bdg-fine">After checkout and payment; not guaranteed</span>
-      </li>
-      <li>
-        <span class="bdg-label">Code validity</span>
-        <span class="bdg-val">1 year</span>
-        <span class="bdg-fine">From the date it is received or issued</span>
-      </li>
-    </ul>
   </div>
 </section>
 

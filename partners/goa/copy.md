@@ -14,10 +14,15 @@ As a GOA member, you're eligible to redeem your **Free Suppressor Rebate**.
 
 **CTA:** How to Redeem Your Rebate · Shop Suppressors
 
-## 2. Rebate at a glance
-| Rebate value | Eligible suppressor | Estimated lead time | Code validity |
-|---|---|---|---|
-| $189.99 — applied toward the eligible suppressor | 4" Hunter — non-magnum only | 8–12 weeks — after checkout and payment; not guaranteed | 1 year — from the date it is received or issued |
+## 2. Rebate at a glance — блок удалён
+
+Строка из четырёх фактов (сумма рибейта, что положено, срок, срок действия
+кода) снята по просьбе клиента 09.09.2026.
+
+⚠️ **Следствие:** сумма $189.99 теперь встречается на странице ровно один раз —
+в тексте Terms. Срок «8–12 недель» и годичный срок действия кода тоже остались
+только в условиях и на инфографике. Раньше эти четыре факта были видны сразу,
+без чтения условий.
 
 ## 3. How to Redeem Your Rebate
 *Use your rebate code at checkout to redeem your 4" Hunter Suppressor (non-magnum).*
