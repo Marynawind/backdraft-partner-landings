@@ -28,7 +28,6 @@
   /* type colours */
   --text:#EDEDEC;
   --muted:#B2AFA8;
-  --muted-dark:#A8A298;
   --brass:#BD8531;
   --brass-lit:#E3B25F;
   /* type scale */
@@ -39,11 +38,10 @@
   --t-body:16px;
   --t-lead:18px;
   --t-card:20px;
-  --t-h2:clamp(28px,3.6vw,44px);
   --t-h1:clamp(34px,4.6vw,60px);
   /* spacing scale */
   --s1:8px;  --s2:12px; --s3:16px; --s4:24px;
-  --s5:32px; --s6:48px; --s7:64px; --s8:80px;
+  --s5:32px; --s6:48px; --s8:80px;
   --pad-card:28px;
   --radius:2px;
 
@@ -84,13 +82,6 @@
 
 /* every section shares one vertical rhythm */
 .bdg-hero,.bdg-steps,.bdg-legal,.bdg-close{padding:var(--s8) 0 84px;}
-
-/* section eyebrow */
-.bdg-label{
-  font-size:var(--t-label);font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;
-  color:var(--muted-dark);
-}
 
 /* buttons */
 .bdg-btn{
@@ -279,9 +270,6 @@
 
 /* ---------- 3. How to Redeem --------------------------------------------- */
 .bdg-steps{background:var(--recess);}
-.bdg-steps h2{font-size:var(--t-h2);margin-top:var(--s2);color:#fff;}
-.bdg-steps h2 em{font-style:normal;color:var(--brass-lit);}
-.bdg-steps .bdg-sub{color:var(--muted);font-size:var(--t-lead);max-width:56ch;margin-top:var(--s2);}
 
 /* Шаги — живым текстом, а не картинкой. Инфографика несла те же сведения
    растром: на телефоне её мелкий шрифт не читался, в поиск и скринридер она
@@ -294,7 +282,7 @@
    screen против строго чёрного возвращает подложку нетронутой, а чёрная точка
    у файла опущена заранее, иначе остался бы светлый прямоугольник.
    Цена приёма: никаких transform на родителях. */
-figure.bdg-poster{margin-top:var(--s5);position:relative;}
+figure.bdg-poster{position:relative;}
 /* Шаги живут внутри растра, поэтому ссылки из них нельзя сделать разметкой.
    Поверх картинки ложатся прозрачные <a>: подчёркивание нарисовано в самой
    картинке, а рамки клика build.py берёт из assets/link-map.json, который
@@ -491,10 +479,6 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
 <!-- 3. How to Redeem Your Rebate -->
 <section class="bdg-steps" id="how-to-redeem">
   <div class="bdg-wrap">
-    <p class="bdg-label">Six steps</p>
-    <h2>How to Redeem Your <em>Rebate</em></h2>
-    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor:</p>
-
     <figure class="bdg-poster">
       <img src="assets/redemption-infographic.webp" width="1300" height="1052" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor: Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
       <!--poster-links-->
