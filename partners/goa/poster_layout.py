@@ -20,6 +20,7 @@
 с самой инфографики — см. константы ниже.
 """
 from PIL import Image, ImageDraw, ImageFont
+import json
 import pathlib
 
 HERE = pathlib.Path(__file__).parent
@@ -72,6 +73,19 @@ COLUMNS = [
      "Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, "
      "transfer, tax, and required adapter costs apply.*"),
 ]
+# Ссылки, которые были у шагов живым текстом. Внутри растра ссылки не бывает,
+# поэтому слово подчёркивается латунью прямо в картинке, а его рамка пишется
+# в assets/link-map.json в долях от размера картинки — build.py кладёт по ним
+# прозрачные <a> поверх. Доли, а не пиксели: картинка тянется по ширине окна.
+LINKS = {
+    1: ("BackdraftSuppressors.com", "https://backdraftsuppressors.com/"),
+    2: ('4" Hunter', "https://backdraftsuppressors.com/backdraft-hunter/"),
+    3: ("HUB Adapter", "https://backdraftsuppressors.com/adapters/"),
+}
+LINK_MAP = HERE / "assets" / "link-map.json"
+UNDERLINE = (6, 2)                 # отступ от базовой линии и толщина
+HOT_PAD = 10                       # запас рамки клика вокруг слова
+
 ICON_SRC = {                       # откуда режем иконки, замер по исходникам
     "arrow": ("strip", (16, 17, 115, 118)),
     "star": ("strip", (712, 22, 782, 106)),
@@ -190,6 +204,9 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
     draw.rectangle(SUB_BOX, fill=(0, 0, 0))
     put(SUB_X, SUB_BASE, SUBTITLE, sized(REG, SUB_CAP), INK, anchor="ls")
 
+    ascent = f_step.getmetrics()[0] / SS
+    hotspots = []
+
     y = ZONE_TOP
     for i, step in enumerate(STEPS, 1):
         lines = wrap(step, f_step, x1 - PAD - TEXT_X)
@@ -199,6 +216,17 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
         put(nx, top + STEP_CAP - NUM_CAP, num, f_num, BRASS)
         for j, line in enumerate(lines):
             put(TEXT_X, top + j * STEP_LEAD, line, f_step, INK)
+            phrase, href = LINKS.get(i, (None, None))
+            if not phrase or phrase not in line:
+                continue
+            lx = TEXT_X + f_step.getlength(line[:line.index(phrase)]) / SS
+            lw = f_step.getlength(phrase) / SS
+            base = top + j * STEP_LEAD + ascent
+            ink.rectangle((lx * SS, (base + UNDERLINE[0]) * SS,
+                           (lx + lw) * SS, (base + UNDERLINE[0] + UNDERLINE[1]) * SS), fill=BRASS)
+            hotspots.append({"href": href, "label": phrase,
+                             "box": (lx - HOT_PAD / 2, top + j * STEP_LEAD - HOT_PAD / 2,
+                                     lw + HOT_PAD, STEP_LEAD + HOT_PAD)})
         y = top + len(lines) * STEP_LEAD + STEP_GAP
         if i < len(STEPS):
             draw.line((x0, y, x1, y), fill=LINE)
@@ -239,6 +267,16 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
             if s[0] or s[1] or s[2]:
                 d = px[xx, yy]
                 px[xx, yy] = tuple(255 - (255 - d[i]) * (255 - s[i]) // 255 for i in range(3))
+    LINK_MAP.write_text(json.dumps(
+        [{"href": h["href"], "label": h["label"],
+          "left": round(h["box"][0] / poster.width * 100, 3),
+          "top": round(h["box"][1] / poster.height * 100, 3),
+          "width": round(h["box"][2] / poster.width * 100, 3),
+          "height": round(h["box"][3] / poster.height * 100, 3)} for h in hotspots],
+        ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    missing = [p for i, (p, _) in LINKS.items() if not any(h["label"] == p for h in hotspots)]
+    assert not missing, f"слово для ссылки не найдено в наборе: {missing}"
+    print(f"  ссылок поверх картинки: {len(hotspots)} ({', '.join(h['label'] for h in hotspots)})")
     print(f"  холст {poster.width}x{poster.height}, шаги {ZONE_TOP}..{steps_bottom},"
           f" полоса {box_y}..{box_y + box_h - 1}, зазор {box_y - steps_bottom} px,"
           f" текст с x={TEXT_X} в обоих блоках, рендер опущен на {drop} px")

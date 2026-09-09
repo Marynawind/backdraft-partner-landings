@@ -294,7 +294,15 @@
    screen против строго чёрного возвращает подложку нетронутой, а чёрная точка
    у файла опущена заранее, иначе остался бы светлый прямоугольник.
    Цена приёма: никаких transform на родителях. */
-figure.bdg-poster{margin-top:var(--s5);}
+figure.bdg-poster{margin-top:var(--s5);position:relative;}
+/* Шаги живут внутри растра, поэтому ссылки из них нельзя сделать разметкой.
+   Поверх картинки ложатся прозрачные <a>: подчёркивание нарисовано в самой
+   картинке, а рамки клика build.py берёт из assets/link-map.json, который
+   пишет poster_layout.py. Рамки в долях, а не в пикселях, — картинка тянется
+   по ширине окна, и в пикселях они бы разъехались. */
+.bdg-hot{position:absolute;display:block;border-radius:3px;}
+.bdg-hot:hover{background:rgba(226,178,95,.16);}
+.bdg-hot:focus-visible{outline:2px solid var(--brass-lit);outline-offset:2px;}
 .bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
 
 /* ---------- Ролик «как это работает» ---------------------------------------
@@ -450,6 +458,7 @@ figure.bdg-poster{margin-top:var(--s5);}
 
     <figure class="bdg-poster">
       <img src="assets/redemption-infographic.webp" width="1300" height="1052" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor: Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
+      <!--poster-links-->
     </figure>
 
     <div class="bdg-notecard">

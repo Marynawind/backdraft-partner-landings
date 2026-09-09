@@ -18,11 +18,15 @@ Outputs:
 Stdlib only. Run from partners/goa:  python3 build.py
 """
 import base64
+import html
+import json
 import pathlib
 import re
 
 HERE = pathlib.Path(__file__).parent
 PAGE = HERE / "page.src.html"
+LINK_MAP = HERE / "assets" / "link-map.json"
+LINK_MARKER = "<!--poster-links-->"
 
 PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 <style>
@@ -33,6 +37,24 @@ PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 <div class="mock-note">Preview mock &mdash; the store header and footer are rendered by the BigCommerce theme</div>
 """
 PREVIEW_FOOT = '<div class="mock-footer">&copy; 2026 Backdraft Suppressors &mdash; preview mock of the store footer</div>\n'
+
+
+def poster_links(page: str) -> str:
+    """Разложить прозрачные <a> поверх инфографики по карте от poster_layout."""
+    if page.count(LINK_MARKER) != 1:
+        raise SystemExit(f"{LINK_MARKER} must appear exactly once in page.src.html")
+    spots = json.loads(LINK_MAP.read_text(encoding="utf-8"))
+    if not spots:
+        raise SystemExit("link-map.json is empty — run tools-cutout.py first")
+    tags = "\n".join(
+        '      <a class="bdg-hot" href="{href}" aria-label="{label}"'
+        ' style="left:{left}%;top:{top}%;width:{width}%;height:{height}%"></a>'.format(
+            href=s["href"], label=html.escape(s["label"], quote=True),
+            left=s["left"], top=s["top"], width=s["width"], height=s["height"])
+        for s in spots)
+    print(f"  {len(spots)} ссылок поверх инфографики: "
+          + ", ".join(s["label"] for s in spots))
+    return page.replace(LINK_MARKER, tags.strip())
 
 
 def inline(page: str) -> str:
@@ -57,7 +79,7 @@ def inline(page: str) -> str:
 
 
 if __name__ == "__main__":
-    standalone = inline(PAGE.read_text(encoding="utf-8"))
+    standalone = inline(poster_links(PAGE.read_text(encoding="utf-8")))
     for name, body in (("bigcommerce-page.html", standalone),
                        ("preview.html", PREVIEW_HEAD + standalone + PREVIEW_FOOT)):
         out = HERE / name
