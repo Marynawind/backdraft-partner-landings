@@ -108,9 +108,13 @@ def draw_h(im, quad, ink, bg, stroke, margin=2.0):
     return im
 
 
-def patch(name, angle, ocr_box, thr=70, glyph_box=None, margin=2.0):
+def patch(name, angle, ocr_box, thr=70, glyph_box=None, margin=2.0, region=None):
+    """region — работать не со всей картинкой, а с её куском. Нужно для мелких
+    надписей: на полном размере OCR их не разрешает, а в вырезе — да, и заодно
+    координаты остаются маленькими."""
     src = SRC / f"{name}.webp"
-    im = Image.open(src).convert("RGB")
+    full = Image.open(src).convert("RGB")
+    im = full.crop(region) if region else full
     inv = affine_to_rotated(im.size, angle)
     rot = im.rotate(angle, resample=Image.BICUBIC, expand=True, fillcolor=(0, 0, 0))
     if glyph_box:
@@ -125,14 +129,23 @@ def patch(name, angle, ocr_box, thr=70, glyph_box=None, margin=2.0):
     quad = [inv(gx, gy), inv(gx+gw, gy), inv(gx+gw, gy+gh), inv(gx, gy+gh)]
 
     rp = rot.load()
-    ink_px = [rp[x, y] for y in range(gy, gy+gh) for x in range(gx, gx+gw) if max(rp[x, y]) > 110]
+    # цвет штриха берём как медиану самых ярких 40% пикселей глифа, а не по
+    # фиксированному порогу: на мелких надписях чернила заметно темнее, и
+    # жёсткий порог не находил ни одного пикселя
+    cell = [rp[x, y] for y in range(gy, gy+gh) for x in range(gx, gx+gw)]
+    cell.sort(key=max, reverse=True)
+    ink_px = cell[:max(4, len(cell)*2//5)]
     ring = [rp[x, y] for y in range(gy-8, gy-3) for x in range(gx-4, gx+gw+4) if max(rp[x, y]) <= thr]
     ink = tuple(sorted(c[i] for c in ink_px)[len(ink_px)//2] for i in range(3))
     bg = tuple(sorted(c[i] for c in ring)[len(ring)//2] for i in range(3)) if ring else (0, 0, 0)
 
-    stroke = max(3.0, round(gw * 0.30, 1))       # доля ширины глифа
+    # доля ширины глифа. Жёсткого минимума быть не должно: на глифе 5x5
+    # штрих в 3 px превращает букву в сплошное пятно
+    stroke = max(1.0, round(gw * 0.30, 1))
     print(f"{name}: глиф {gw}x{gh}, штрих {stroke}, чернила {ink}, фон {bg}")
     out = draw_h(im, quad, ink, bg, stroke, margin)
+    if region:
+        full.paste(out, region[:2]); out = full
     out.save(src, "WEBP", quality=95, method=6)
     return src
 
@@ -189,3 +202,8 @@ if __name__ == "__main__":
     patch_flat("redemption-infographic", (1230, 390, 160, 29))
     # на странице сейчас не используется, но набор ассетов держим согласованным
     patch("step-4-rebate-code", -10, (553, 438, 114, 24), glyph_box=(568, 439, 12, 17), margin=0.3)
+    # вторая, мелкая гравировка на инфографике — в карточке шага 2. Буквы там
+    # по 4-5 px: на странице это ~4 px высотой и глазом не читается, правится
+    # ради согласованности ассета, а не ради того, что увидит посетитель.
+    patch("redemption-infographic", -90, (43, 58, 46, 11), thr=60,
+          glyph_box=(48, 61, 5, 5), margin=0.2, region=(440, 560, 580, 700))
