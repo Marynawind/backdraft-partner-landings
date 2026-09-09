@@ -156,21 +156,25 @@
 /* Hero entrance. Everything is declared visible and only animates from there,
    so `prefers-reduced-motion` (which kills every animation further down) leaves
    a correctly rendered hero rather than an empty one. */
+/* Заголовок анимируется ТОЛЬКО цветом.
+   Раньше слова ещё и всплывали снизу (translate3d). На телефоне это давало
+   заметное дрожание: сдвиг текста по вертикали заставляет браузер пересобирать
+   глифы на каждом кадре, и буквы мелко трясутся. Движение убрано целиком —
+   осталось остывание из латуни в белый и тёплая волна по кругу.
+   inline-block тоже снят: он был нужен только под transform. */
 .bdg-hero h1 span{
-  display:inline-block;
   animation:
-    bdg-rise .85s cubic-bezier(.2,.75,.25,1) both,   /* всплывает */
     bdg-title-cool 1.5s ease-out both,               /* прилетает латунным, остывает в белый */
     bdg-title-wave 4.5s ease-in-out infinite;        /* дальше тёплая волна по кругу */
 }
-/* три задержки на слово — по одной на каждую анимацию из списка выше.
-   Волна идёт с шагом 0,22 с против 0,09 с у набора: так она читается как
+/* две задержки на слово — по одной на каждую анимацию из списка выше.
+   Волна идёт с шагом 0,22 с против 0,09 с у остывания: так она читается как
    отдельный проход, а не как повтор появления. */
-.bdg-hero h1 span:nth-child(1){animation-delay:.08s,.08s,2.20s;}
-.bdg-hero h1 span:nth-child(2){animation-delay:.17s,.17s,2.42s;}
-.bdg-hero h1 span:nth-child(3){animation-delay:.26s,.26s,2.64s;}
-.bdg-hero h1 span:nth-child(4){animation-delay:.35s,.35s,2.86s;}
-.bdg-hero h1 span:nth-child(5){animation-delay:.44s,.44s,3.08s;}
+.bdg-hero h1 span:nth-child(1){animation-delay:.08s,2.20s;}
+.bdg-hero h1 span:nth-child(2){animation-delay:.17s,2.42s;}
+.bdg-hero h1 span:nth-child(3){animation-delay:.26s,2.64s;}
+.bdg-hero h1 span:nth-child(4){animation-delay:.35s,2.86s;}
+.bdg-hero h1 span:nth-child(5){animation-delay:.44s,3.08s;}
 /* the rule draws itself out from under the last word */
 .bdg-rule{transform-origin:left center;animation:bdg-draw .5s cubic-bezier(.2,.75,.25,1) .56s both;}
 .bdg-lede{animation:bdg-rise .8s cubic-bezier(.2,.75,.25,1) .64s both;}
