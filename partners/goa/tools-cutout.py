@@ -23,6 +23,7 @@ poster is squeezed to the width the layout actually uses.
 Needs Pillow. Run from partners/goa:  python3 tools-cutout.py
 """
 from PIL import Image, ImageDraw
+import poster_layout
 import pathlib
 
 FLOOR = 24      # brightness at or below this is backdrop, not ink
@@ -42,17 +43,22 @@ REEL_W, REEL_Q, REEL_AQ = 440, 80, 70
 
 # Инфографика идёт целиком, но четыре карточки с шагами из неё стёрты: те же
 # шаги теперь живым текстом под картинкой, растром они не читались на телефоне
-# и не попадали в поиск. Рамка стирания снята замером: карточки заканчиваются
-# на x≈1080, дальше чистый зазор, рендер глушителя начинается с x≈1200.
-# Заливаем чёрным — после блендинга screen это ровно фон страницы.
+# и не попадали в поиск. Заливаем чёрным — после блендинга screen это ровно
+# фон страницы.
 POSTER = "redemption-infographic"
-# Рамка снята замером: цифры карточек начинаются с y≈522 (выше них декоративная
-# линейка под подзаголовком — её сохраняем), слева контент с x≈80, справа
-# карточки кончаются на x≈1080, дальше чистый зазор до рендера с x≈1200.
-POSTER_CARDS = (70, 522, 1088, 890)    # зона карточек, стирается
+# Рамка снята замером по самим карточкам: рамки стоят на x=78 и x=1119,
+# верхняя граница y=510, нижняя y=891. Берём с запасом в 2 px, иначе от
+# карточек остаются куски рамок и обрывки букв — так и было до этой правки.
+# Выше зоны декоративная линейка под подзаголовком (y≈486) — её сохраняем,
+# ниже блок-сноска (с y=909) — его тоже.
 POSTER_W = 1300   # колонка контента не шире 1112 px
 POSTER_Q = 82
 POSTER_BLACK = 16 # чёрная точка, см. ниже
+
+# Низ инфографики перебран целиком: четыре карточки Outlier стёрты, на их месте
+# шесть шагов клиента списком, под ними компактная полоса апгрейда со сноской.
+# Раскладка и набор — в poster_layout.py.
+STRIP = "upgrade-strip"
 
 
 def cut(src: pathlib.Path) -> Image.Image:
@@ -110,9 +116,9 @@ if __name__ == "__main__":
     # the poster keeps a faintly lighter rectangle over the page gradient.
     src, dst = SRC / f"{POSTER}.webp", OUT / f"{POSTER}.webp"
     im = Image.open(src).convert("RGB")
-    ImageDraw.Draw(im).rectangle(POSTER_CARDS, fill=(0, 0, 0))
+    im = poster_layout.compose(im, Image.open(SRC / f"{STRIP}.png").convert("RGB"))
     im = im.resize((POSTER_W, round(POSTER_W * im.size[1] / im.size[0])), Image.LANCZOS)
     scale = 255 / (255 - POSTER_BLACK)
     im = im.point(lambda v: min(255, round((v - POSTER_BLACK) * scale)) if v > POSTER_BLACK else 0)
     im.save(dst, "WEBP", quality=POSTER_Q, method=6)
-    print(f"{POSTER:22} {src.stat().st_size/1024:5.1f} KB -> {dst.stat().st_size/1024:5.1f} KB   {im.size[0]}x{im.size[1]}, карточки стёрты")
+    print(f"{POSTER:22} {src.stat().st_size/1024:5.1f} KB -> {dst.stat().st_size/1024:5.1f} KB   {im.size[0]}x{im.size[1]}, низ перебран")

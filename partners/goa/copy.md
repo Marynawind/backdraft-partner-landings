@@ -33,12 +33,26 @@ As a GOA member, you're eligible to redeem your **Free Suppressor Rebate**.
 
 1. Visit BackdraftSuppressors.com
 2. Select a 4" Hunter, or upgrade to 6", 8", or steel Poacher for an additional cost.
-3. Select the required HUB Adapter
+3. Select the required HUB Adapter.
 4. Enter the rebate code at checkout.
 5. Select your preferred FFL/SOT for suppressor transfer.
 6. Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.
 
-Текст клиента дословно, получен 09.09.2026. Над шагами — инфографика клиента.
+Текст клиента дословно, получен 09.09.2026. **Шаги стоят внутри инфографики,
+живым текстом на странице их больше нет** — решение клиента от 09.09.2026.
+
+⚠️ **Чем это оплачено.** Шаги теперь растр, и из этого следует:
+- на телефоне они не читаются: картинка идёт `width:100%`, кегль выходит ~5 px;
+- в поиск и в скринридер попадают только через `alt` картинки;
+- ссылки внутри шагов (4" Hunter, HUB Adapter, BackdraftSuppressors.com)
+  перестали быть кликабельными;
+- любая правка формулировки требует пересборки картинки, а не правки строки.
+
+Ровно по этим причинам 8 сентября карточки с шагами из картинки убирали.
+Если решение будут пересматривать — вернуть живой список можно из истории git.
+
+**При любой правке шагов обновлять `alt` инфографики**: сейчас это единственное
+место, где шаги доступны поиску и скринридеру.
 
 ⚠️ **Из инфографики стёрты четыре карточки с шагами.** Раньше она несла те же
 шаги растром: на телефоне её шрифт не читался, в поиск и скринридер они
@@ -51,6 +65,30 @@ As a GOA member, you're eligible to redeem your **Free Suppressor Rebate**.
 your free 4" Hunter suppressor.») повторяет строку, которая стоит на странице
 над ней. Это часть исходной картинки клиента; если дублирование мешает —
 эту строку тоже можно стереть, рамка расширяется на несколько пикселей вверх.
+
+### Полоса апгрейда на инфографике
+
+На месте стёртых карточек стоит полоса Outlier — иначе там оставалась дыра
+в треть высоты картинки. Полоса и нижняя плашка со сноской сведены в один блок
+с общей рамкой. Текст полосы (правка клиента от 09.09.2026, было «5" or 6"»):
+
+> **WANT MORE PERFORMANCE?**
+> Upgrade to a 4" or 6" or 8" suppressor for more length, better sound
+> reduction, and even more performance.
+
+> **GO FULL AUTO. GO STAINLESS.**
+> Upgrade to our stainless steel, full auto rated suppressor options built
+> for the most demanding use.
+
+Полосу готовит `tools-upgrade-strip.py` из скриншота клиента в `reference/`,
+вписывает её в постер `tools-cutout.py`. Текст продублирован в `alt` картинки —
+**при любой правке полосы обновлять `alt`**, иначе предложение об апгрейде
+пропадёт из поиска и из скринридеров.
+
+⚠️ На телефоне текст полосы, как и весь мелкий текст картинки, не читается:
+картинка идёт `width:100%`. Шаги на такой случай продублированы живым текстом,
+а предложение об апгрейде — нет, оно живёт только внутри картинки и в `alt`.
+Если оно должно читаться на телефоне, его нужно вынести на страницу версткой.
 
 **Ready to Redeem?** Choose your 4" Hunter Suppressor, add the required HUB Adapter, and enter your rebate code at checkout.
 **Кнопка:** Redeem Your Suppressor Now → `backdraftsuppressors.com/backdraft-hunter/`

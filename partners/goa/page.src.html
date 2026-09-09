@@ -73,7 +73,7 @@
 /* ⚠️ Сброс задан по типу элемента, поэтому он специфичнее (0,1,1) любого
    правила по одному классу (0,1,0) и молча съедает у них margin и padding.
    Любому figure/ol/ul/li со своими отступами селектор пишем с именем тега,
-   например ol.bdg-steplist. */
+   например figure.bdg-poster. */
 .bdg p,.bdg h1,.bdg h2,.bdg h3,.bdg h4,.bdg ul,.bdg ol,.bdg li,.bdg figure{margin:0;padding:0;}
 .bdg ul,.bdg ol{list-style:none;}
 .bdg img{display:block;max-width:100%;height:auto;}
@@ -296,22 +296,6 @@
    Цена приёма: никаких transform на родителях. */
 figure.bdg-poster{margin-top:var(--s5);}
 .bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
-ol.bdg-steplist{margin-top:var(--s5);display:grid;gap:0;counter-reset:step;}
-.bdg-steplist li{
-  display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
-  align-items:baseline;padding:var(--s3) 0;border-top:1px solid var(--line-soft);
-}
-.bdg-steplist li:last-child{border-bottom:1px solid var(--line-soft);}
-.bdg-steplist li::before{
-  counter-increment:step;content:counter(step);
-  display:inline-flex;align-items:center;justify-content:center;
-  width:30px;height:30px;border-radius:50%;background:var(--brass);color:#15100A;
-  font-size:var(--t-micro);font-weight:800;font-variant-numeric:tabular-nums;
-  transform:translateY(4px);
-}
-.bdg-steplist p{font-size:var(--t-lead);color:var(--text);line-height:1.5;max-width:56ch;}
-.bdg-steplist a{color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--brass);}
-.bdg-steplist a:hover{color:var(--brass-lit);}
 
 /* ---------- Ролик «как это работает» ---------------------------------------
    Видео-инструкция без видео: четыре шага сменяют друг друга сами, по 2 с,
@@ -462,20 +446,11 @@ ol.bdg-steplist{margin-top:var(--s5);display:grid;gap:0;counter-reset:step;}
   <div class="bdg-wrap">
     <p class="bdg-label">Six steps</p>
     <h2>How to Redeem Your <em>Rebate</em></h2>
-    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor:</p>
+    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor.</p>
 
     <figure class="bdg-poster">
-      <img src="assets/redemption-infographic.webp" width="1300" height="867" alt="Backdraft Suppressors — How to redeem your free suppressor rebate" loading="lazy">
+      <img src="assets/redemption-infographic.webp" width="1300" height="981" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your free 4&Prime; Hunter suppressor. Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
     </figure>
-
-    <ol class="bdg-steplist">
-      <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>
-      <li><p>Select a <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter</a>, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost.</p></li>
-      <li><p>Select the required <a href="https://backdraftsuppressors.com/adapters/">HUB Adapter</a></p></li>
-      <li><p>Enter the rebate code at checkout.</p></li>
-      <li><p>Select your preferred FFL/SOT for suppressor transfer.</p></li>
-      <li><p>Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.</p></li>
-    </ol>
 
     <div class="bdg-notecard">
       <h2><span class="bdg-ast">*</span>Please note:</h2>
