@@ -425,7 +425,13 @@ ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
      поэтому на узких экранах ограничиваем её отдельно от десктопных 300px */
 
-  .bdg{--s8:48px;--s6:32px;--t-label:13px;}
+  /* На телефоне кегль поднят: на 16 px основной текст читается мельче, чем
+     привычный системный, а места по ширине после отказа от узкой колонки
+     хватает. Заодно снят предел ширины у абзацев условий — 59ch держали
+     колонку в две трети экрана. */
+  .bdg{--s8:48px;--s6:32px;--t-label:13px;--t-body:17px;--t-lead:19px;--t-micro:14px;--t-legal:17px;}
+  .bdg-legal p{max-width:none;}
+  .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
