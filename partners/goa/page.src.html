@@ -1,0 +1,791 @@
+<!-- ==========================================================================
+     Backdraft Suppressors — Gun Owners of America landing page
+     Target URL: backdraftsuppressors.com/GOA
+     Paste this whole block into the BigCommerce page's HTML source view.
+
+     Copy: welcome text per the client brief; redemption steps, fine print and
+     imagery reproduced from getoutlier.com/redemption.
+     All CSS is scoped under .bdg so it cannot leak into the Stencil theme.
+     Images are hot-linked from the Outlier CDN — see DEPLOY.md to re-host them
+     on the BigCommerce CDN.
+     ========================================================================== -->
+<div class="bdg">
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+.bdg{
+  /* surfaces
+     The page runs ONE continuous vertical ramp — deep cool black at the top,
+     warm brass-tinted charcoal at the bottom. So section backgrounds are
+     translucent tints rather than opaque colours: an opaque block would punch
+     a flat hole in the ramp. Same reason the lines are rgba, not hex — a fixed
+     grey disappears against the lighter bottom. */
+  --lift:rgba(255,255,255,.05);
+  --recess:rgba(0,0,0,.11);
+  --art:url("assets/step-2-suppressor.webp");   /* шапка и шаг 2 ролика — один файл */
+  --line:rgba(255,255,255,.15);
+  --line-soft:rgba(255,255,255,.08);
+  /* type colours */
+  --text:#EDEDEC;
+  --muted:#B2AFA8;
+  --muted-dark:#A8A298;
+  --brass:#BD8531;
+  --brass-lit:#E3B25F;
+  /* type scale */
+  --f:"Manrope","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --t-label:12px;
+  --t-micro:13px;
+  --t-legal:15px;
+  --t-body:16px;
+  --t-lead:18px;
+  --t-card:20px;
+  --t-h2:clamp(28px,3.6vw,44px);
+  --t-h1:clamp(34px,4.6vw,60px);
+  /* spacing scale */
+  --s1:8px;  --s2:12px; --s3:16px; --s4:24px;
+  --s5:32px; --s6:48px; --s7:64px; --s8:80px;
+  --pad-card:28px;
+  --radius:2px;
+
+  font-family:var(--f);
+  color:var(--text);
+  /* Построено на графите магазина (#333333), а не на чёрном: сверху графит
+     глубже, к низу светлеет и теплеет латунью. Светлее чёрного примерно на
+     30 уровней, поэтому вся светлая типографика ниже пересчитана — на графите
+     прежние тона не вытягивали AA. */
+  background:linear-gradient(180deg,
+    #26262A  0%,
+    #2A2A2E 12%,
+    #2E2E31 26%,
+    #323231 42%,
+    #363431 58%,
+    #3A3731 74%,
+    #3D3A32 88%,
+    #403C33 100%);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  margin:0 calc(50% - 50vw);
+  width:100vw;
+  max-width:100vw;
+  overflow-x:hidden;
+}
+.bdg *,.bdg *::before,.bdg *::after{box-sizing:border-box;}
+/* ⚠️ Сброс задан по типу элемента, поэтому он специфичнее (0,1,1) любого
+   правила по одному классу (0,1,0) и молча съедает у них margin и padding.
+   Любому figure/ol/ul/li со своими отступами селектор пишем с именем тега:
+   figure.bdg-poster, ol.bdg-ticker-track и так далее. */
+.bdg p,.bdg h1,.bdg h2,.bdg h3,.bdg h4,.bdg ul,.bdg ol,.bdg li,.bdg figure{margin:0;padding:0;}
+.bdg ul,.bdg ol{list-style:none;}
+.bdg img{display:block;max-width:100%;height:auto;}
+.bdg h1,.bdg h2,.bdg h3,.bdg h4{font-weight:800;letter-spacing:-.02em;line-height:1.1;text-wrap:balance;}
+.bdg a:focus-visible{outline:2px solid var(--brass-lit);outline-offset:3px;}
+
+.bdg-wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 var(--s4);}
+
+/* every section shares one vertical rhythm */
+.bdg-hero,.bdg-steps,.bdg-note,.bdg-legal,.bdg-close{padding:var(--s8) 0 84px;}
+
+/* section eyebrow */
+.bdg-label{
+  font-size:var(--t-label);font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted-dark);
+}
+
+/* buttons */
+.bdg-btn{
+  display:inline-flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--f);font-size:var(--t-body);font-weight:700;
+  padding:var(--s3) var(--s5);border:1px solid var(--brass);border-radius:var(--radius);
+  text-decoration:none;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+.bdg-btn--solid{background:var(--brass);color:#15100A;}
+.bdg-btn--solid:hover,.bdg-btn--solid:focus-visible{background:var(--brass-lit);border-color:var(--brass-lit);color:#15100A;}
+.bdg-btn--ghost{background:transparent;color:var(--text);border-color:var(--line);}
+.bdg-btn--ghost:hover,.bdg-btn--ghost:focus-visible{border-color:var(--brass);color:var(--brass-lit);}
+/* Кнопки в ряду одного размера, а не по длине надписи: колонки сетки равны,
+   minmax(0,1fr) не даёт длинному тексту растянуть свою колонку. */
+.bdg-cta-row{
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  /* и по высоте тоже: в столбике одна надпись переносится на две строки,
+     а другая нет — 1fr выравнивает ряды между собой */
+  grid-auto-rows:1fr;gap:var(--s2);
+}
+.bdg-cta-row .bdg-btn{width:100%;}
+
+/* one card recipe, used by every boxed block */
+.bdg-ready,.bdg-notecard,.bdg-ack{
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:var(--pad-card);
+}
+.bdg-ready,.bdg-notecard,.bdg-ack{background:var(--lift);border-left:3px solid var(--brass);}
+
+/* line art ships as a transparent cut-out (see tools-cutout.py), so it needs no
+   blend mode — which is what frees its wrapper to carry a transform */
+.bdg-art{filter:drop-shadow(0 0 24px rgba(178,123,41,.22));}
+
+/* ---------- 1. Welcome --------------------------------------------------- */
+.bdg-hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(110% 80% at 8% 0%, rgba(178,123,41,.20) 0%, rgba(178,123,41,0) 55%);
+  border-bottom:1px solid var(--line);
+}
+.bdg-hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 104px);
+}
+.bdg-hero .bdg-wrap{position:relative;z-index:1;}
+.bdg-herogrid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:var(--s6);align-items:center;}
+.bdg-hero h1{font-size:var(--t-h1);color:#fff;}
+.bdg-rule{width:80px;height:3px;background:var(--brass);margin-top:var(--s4);}
+.bdg-lede{font-size:clamp(17px,1.4vw,19px);color:var(--muted);max-width:56ch;margin-top:var(--s4);}
+.bdg-eligible{font-size:clamp(19px,1.8vw,23px);font-weight:600;color:var(--text);max-width:50ch;margin-top:var(--s3);}
+.bdg-eligible strong{color:var(--brass-lit);font-weight:800;}
+.bdg-hero .bdg-cta-row{margin-top:var(--s5);}
+/* Hero entrance. Everything is declared visible and only animates from there,
+   so `prefers-reduced-motion` (which kills every animation further down) leaves
+   a correctly rendered hero rather than an empty one. */
+.bdg-hero h1 span{
+  display:inline-block;
+  animation:
+    bdg-rise .85s cubic-bezier(.2,.75,.25,1) both,   /* всплывает */
+    bdg-title-cool 1.5s ease-out both,               /* прилетает латунным, остывает в белый */
+    bdg-title-wave 4.5s ease-in-out infinite;        /* дальше тёплая волна по кругу */
+}
+/* три задержки на слово — по одной на каждую анимацию из списка выше.
+   Волна идёт с шагом 0,22 с против 0,09 с у набора: так она читается как
+   отдельный проход, а не как повтор появления. */
+.bdg-hero h1 span:nth-child(1){animation-delay:.08s,.08s,2.20s;}
+.bdg-hero h1 span:nth-child(2){animation-delay:.17s,.17s,2.42s;}
+.bdg-hero h1 span:nth-child(3){animation-delay:.26s,.26s,2.64s;}
+.bdg-hero h1 span:nth-child(4){animation-delay:.35s,.35s,2.86s;}
+.bdg-hero h1 span:nth-child(5){animation-delay:.44s,.44s,3.08s;}
+/* the rule draws itself out from under the last word */
+.bdg-rule{transform-origin:left center;animation:bdg-draw .5s cubic-bezier(.2,.75,.25,1) .56s both;}
+.bdg-lede{animation:bdg-rise .8s cubic-bezier(.2,.75,.25,1) .64s both;}
+.bdg-eligible{animation:bdg-rise .8s cubic-bezier(.2,.75,.25,1) .74s both;}
+.bdg-hero .bdg-cta-row{animation:bdg-rise .8s cubic-bezier(.2,.75,.25,1) .86s both;}
+@keyframes bdg-rise{
+  from{opacity:0;transform:translate3d(0,.42em,0);}
+  to  {opacity:1;transform:none;}
+}
+@keyframes bdg-draw{
+  from{transform:scaleX(0);}
+  to  {transform:scaleX(1);}
+}
+/* Цвет заголовка. Базовый #fff задан на самом h1, поэтому при выключенной
+   анимации слова просто белые — обе анимации ниже только уводят цвет оттуда. */
+@keyframes bdg-title-cool{
+  0%,45%{color:var(--brass-lit);text-shadow:0 0 34px rgba(227,178,95,.40);}
+  100%  {color:#fff;text-shadow:none;}
+}
+@keyframes bdg-title-wave{
+  0%,100%{color:#fff;text-shadow:none;}
+  45%    {color:var(--brass-lit);text-shadow:0 0 30px rgba(227,178,95,.32);}
+}
+
+/* Hero artwork. The base transform is declared outside the animations so the
+   suppressor still sits at its intended angle when motion is switched off. */
+/* У файла ~16% пустых полей с каждой стороны, поэтому при `contain` рисунок
+   занимает лишь две трети бокса. На широком экране это воздух, на узком —
+   картинка теряется, и её масштаб приходится задавать отдельно. Размер живёт
+   в переменной: его читают фон, маска и маска блика, и разойтись им нельзя. */
+.bdg-heroart{position:relative;--art-fit:contain;}
+.bdg-heroart .bdg-art{
+  display:block;width:100%;aspect-ratio:1/1;
+  background:var(--art) center/var(--art-fit) no-repeat;
+  transform:rotate(-8deg);
+  animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+            bdg-art-drift 4.5s ease-in-out 1.1s infinite;
+}
+/* Colour flowing through the artwork.
+
+   The cut-out has a FLAT brass RGB — the whole drawing lives in its alpha
+   channel (see tools-cutout.py). So the file works as a mask: put a slowly
+   moving brass gradient underneath and the colour travels along the drawn
+   lines themselves, instead of the flat fill the plain <img> gives.
+
+   Kept behind @supports because the failure mode matters: without masking
+   this rule would paint a solid brass rectangle, so browsers that cannot
+   mask keep the flat artwork above and simply do not shimmer. */
+@supports ((-webkit-mask-image:url("a.webp")) or (mask-image:url("a.webp"))){
+  .bdg-heroart .bdg-art{
+    -webkit-mask:var(--art) center/var(--art-fit) no-repeat;
+            mask:var(--art) center/var(--art-fit) no-repeat;
+    /* tones stay inside the brand's brass, from deep bronze to lit gold —
+       the mid stop is the artwork's own colour, so the average reads unchanged */
+    background:linear-gradient(118deg,
+      #6B4A24  0%, #B07C33 16%, #E2BB66 32%, #F7E6B6 44%,
+      #C0933F 60%, #8E5F27 78%, #6B4A24 100%);
+    /* deliberately close to the element's own size: a much larger gradient
+       would cover the drawing with one near-flat slice and merely pulse the
+       whole thing. At this size several tones sit on the object at once, so
+       the colour actually travels along it. */
+    background-size:135% 135%;
+    animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+              bdg-art-drift 4.5s ease-in-out 1.1s infinite,
+              bdg-art-flow 5s ease-in-out 1.1s infinite alternate;
+  }
+}
+/* A highlight swept across a copy of the artwork, masked by the artwork's own
+   alpha, so the light travels along the drawn lines instead of over a box. */
+.bdg-heroart::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  transform:rotate(-8deg);
+  -webkit-mask:var(--art) center/var(--art-fit) no-repeat;
+          mask:var(--art) center/var(--art-fit) no-repeat;
+  background:linear-gradient(100deg,
+    transparent 30%, rgba(244,214,160,.9) 50%, transparent 70%);
+  background-size:200% 100%;background-position:140% 0;
+  mix-blend-mode:screen;
+  animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+            bdg-art-drift 4.5s ease-in-out 1.1s infinite,
+            bdg-sheen 8.5s ease-in-out 1.9s infinite;
+}
+@keyframes bdg-art-in{
+  from{opacity:0;transform:rotate(-15deg) translate3d(0,28px,0) scale(.93);}
+  to  {opacity:1;transform:rotate(-8deg) translate3d(0,0,0) scale(1);}
+}
+@keyframes bdg-art-flow{
+  from{background-position:0% 50%;}
+  to  {background-position:100% 50%;}
+}
+@keyframes bdg-art-drift{
+  0%,100%{transform:rotate(-8deg) translate3d(0,0,0);}
+  50%    {transform:rotate(-6.8deg) translate3d(0,-13px,0);}
+}
+/* the gradient parks off-frame at both ends, so the loop's jump is never seen */
+@keyframes bdg-sheen{
+  0%,45%  {background-position:140% 0;}
+  95%,100%{background-position:-40% 0;}
+}
+
+/* ---------- 2. Rebate at a glance ---------------------------------------- */
+/* Строка фактов, а не плита. Своя подложка делала из этой полосы светлый
+   блок поперёк страницы и разрывала сквозной градиент; разделяют колонки
+   тонкие волоски, а не рамки ячеек.
+   Подписи здесь — .bdg-fine, а НЕ .bdg-note: секция ниже по странице носит
+   класс .bdg-note и раздавала этим спанам свой padding 80/84px, раздувая
+   ячейку до 326px. Имя менять нельзя. */
+.bdg-specs{padding:var(--s5) 0;border-bottom:1px solid var(--line-soft);}
+.bdg-specs ul{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4);}
+.bdg-specs li{padding-left:var(--s4);border-left:1px solid var(--line-soft);}
+.bdg-specs li:first-child{padding-left:0;border-left:0;}
+.bdg-specs .bdg-label{display:block;}
+.bdg-specs .bdg-val{
+  display:block;font-size:clamp(19px,1.7vw,24px);font-weight:700;letter-spacing:-.015em;
+  color:var(--text);margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.2;
+}
+.bdg-specs .bdg-val em{font-style:normal;color:var(--brass-lit);font-weight:800;}
+.bdg-specs .bdg-fine{display:block;font-size:var(--t-micro);color:var(--muted);margin-top:5px;line-height:1.5;}
+
+/* ---------- 3. How to Redeem --------------------------------------------- */
+.bdg-steps{background:var(--recess);}
+.bdg-steps h2{font-size:var(--t-h2);margin-top:var(--s2);color:#fff;}
+.bdg-steps h2 em{font-style:normal;color:var(--brass-lit);}
+.bdg-steps .bdg-sub{color:var(--muted);font-size:var(--t-lead);max-width:56ch;margin-top:var(--s2);}
+
+/* The poster carries its own black ground, which would sit on the page as a
+   slab. It cannot be cut out — its dark tones are content (see tools-cutout.py)
+   — so the ground is cancelled at render time instead: screen blending against
+   an exactly black source returns the backdrop untouched, and the artwork
+   floats straight on the page gradient. No frame either: with the ground gone
+   a border would outline empty space.
+   Cost of the trick: no ancestor may carry a transform (that would make a
+   stacking context and bring the black slab back), and the page behind it must
+   stay dark. Both hold here — unlike the hero artwork, the poster is static. */
+figure.bdg-poster{margin-top:var(--s6);overflow:hidden;}
+/* всегда по ширине колонки: и уменьшается вместе с окном, и не вылезает */
+.bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
+
+/* ---------- Ролик «как это работает» ---------------------------------------
+   Видео-инструкция без видео: четыре шага сменяют друг друга сами, по 2 с,
+   круг 8 с. Настоящий файл сюда не положить — страница вставляется в
+   BigCommerce одним куском, а даже короткий клип весит больше всей страницы.
+   Здесь же вся анимация — CSS, а картинки те же, что уже есть в проекте.
+
+   Свёрстано «статикой вперёд»: по умолчанию это обычный список из четырёх
+   шагов, и только при prefers-reduced-motion:no-preference он превращается
+   в плеер. Поэтому при выключенной анимации остаётся читаемый список,
+   а не стопка наложенных друг на друга слайдов. */
+figure.bdg-reel{
+  margin-top:var(--s5);border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--lift);overflow:hidden;
+}
+.bdg-reel-bar{
+  display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:center;
+  padding:11px var(--pad-card);border-bottom:1px solid var(--line-soft);
+  font-size:var(--t-label);font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+}
+.bdg-reel-label{color:var(--brass-lit);display:inline-flex;align-items:center;gap:9px;}
+.bdg-reel-label i{width:7px;height:7px;border-radius:50%;background:var(--brass-lit);flex:0 0 auto;}
+.bdg-reel-time{color:var(--muted-dark);letter-spacing:.12em;font-weight:700;}
+/* Бегущая строка. Дорожка с шагами продублирована: обе едут влево на свою
+   ширину, и когда первая уходит целиком, на её месте стоит вторая — стык
+   не виден. Копия помечена aria-hidden, чтобы шаги не читались дважды.
+
+   Свёрстано «статикой вперёд»: по умолчанию это обычная сетка из четырёх
+   шагов, а копия скрыта. Бегущей строкой блок становится только внутри
+   prefers-reduced-motion:no-preference — иначе при выключенной анимации
+   дорожка просто замерла бы, обрезанная по краю. */
+.bdg-ticker{display:block;}
+ol.bdg-ticker-track{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--s5) var(--s4);padding:var(--s5) var(--pad-card);
+}
+ol.bdg-ticker-track + ol{display:none;}
+.bdg-ticker li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:var(--s3);align-items:center;}
+.bdg-reel-art{
+  display:block;width:100%;aspect-ratio:1/1;--art-fit:118%;
+  background:var(--src) center/var(--art-fit) no-repeat;
+}
+.bdg-ticker-track li:nth-child(1) .bdg-reel-art{--src:url("assets/step-1-visit.webp");}
+.bdg-ticker-track li:nth-child(2) .bdg-reel-art{--src:var(--art);}
+.bdg-ticker-track li:nth-child(3) .bdg-reel-art{--src:url("assets/step-3-hub-adapter.webp");}
+.bdg-ticker-track li:nth-child(4) .bdg-reel-art{--src:url("assets/step-4-rebate-code.webp");}
+@supports ((-webkit-mask-image:url("a.webp")) or (mask-image:url("a.webp"))){
+  .bdg-reel-art{
+    -webkit-mask:var(--src) center/var(--art-fit) no-repeat;
+            mask:var(--src) center/var(--art-fit) no-repeat;
+    background:linear-gradient(130deg,#8E5F27 0%,#C0933F 30%,#E2BB66 55%,#A97430 100%);
+  }
+}
+.bdg-stephead{display:flex;align-items:center;gap:var(--s2);}
+.bdg-stepnum{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:var(--brass);color:#15100A;
+  font-size:var(--t-micro);font-weight:800;font-variant-numeric:tabular-nums;
+}
+.bdg-ticker h3{font-size:var(--t-lead);color:#fff;}
+.bdg-ticker p{margin-top:6px;color:var(--muted);font-size:var(--t-micro);line-height:1.55;}
+.bdg-ticker a{color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--brass);}
+.bdg-ticker a:hover{color:var(--brass-lit);}
+
+@media (prefers-reduced-motion:no-preference){
+  .bdg-ticker{
+    display:flex;overflow:hidden;
+    /* края растворяются, чтобы шаги не обрубались о рамку */
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  }
+  ol.bdg-ticker-track{
+    display:flex;flex:0 0 auto;grid-template-columns:none;
+    gap:var(--s6);padding:var(--s5) 0 var(--s5) var(--s6);
+    animation:bdg-ticker 22s linear infinite;
+  }
+  ol.bdg-ticker-track + ol{display:flex;}
+  .bdg-ticker li{width:330px;}
+  .bdg-reel-label i{animation:bdg-reel-blink 2.2s ease-in-out infinite;}
+}
+@keyframes bdg-ticker{
+  from{transform:translate3d(0,0,0);}
+  to  {transform:translate3d(-100%,0,0);}
+}
+@keyframes bdg-reel-blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+.bdg-ast{color:var(--brass-lit);font-weight:800;}
+
+.bdg-ready{
+  margin-top:var(--s5);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s4);
+}
+.bdg-ready h3{font-size:var(--t-card);color:#fff;}
+.bdg-ready p{margin-top:var(--s1);color:var(--muted);font-size:var(--t-body);max-width:48ch;}
+
+/* ---------- 4. Please note ------------------------------------------------ */
+.bdg-note h2{font-size:var(--t-card);color:#fff;}
+.bdg-note h2 .bdg-ast{margin-right:4px;}
+.bdg-note p{color:var(--muted);font-size:var(--t-body);margin-top:var(--s2);max-width:76ch;}
+
+/* ---------- 5. Terms and Conditions --------------------------------------- */
+.bdg-legal{background:var(--recess);border-top:1px solid var(--line);}
+.bdg-legal .bdg-wrap{max-width:880px;}
+.bdg-ack{margin-bottom:var(--s6);}
+.bdg-ack h3{
+  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--brass-lit);margin:0;padding:0;border:0;
+}
+.bdg-ack p{font-size:var(--t-legal);line-height:1.7;color:var(--muted);margin-top:var(--s2);}
+.bdg-legal .bdg-doctitle{
+  font-size:clamp(18px,2.1vw,23px);font-weight:800;color:#fff;margin-top:var(--s2);
+  text-transform:uppercase;line-height:1.3;letter-spacing:-.005em;
+}
+.bdg-legal h2{
+  font-size:var(--t-label);font-weight:800;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--brass-lit);margin-top:var(--s1);
+}
+.bdg-legal .bdg-legalintro{margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--line);}
+.bdg-legal h3{
+  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--brass-lit);margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--line-soft);
+}
+.bdg-legal p{font-size:var(--t-legal);line-height:1.7;color:var(--muted);margin-top:var(--s2);}
+.bdg-legal p.bdg-strong{color:var(--text);font-weight:600;}
+.bdg-legal ol,.bdg-legal ul{margin-top:var(--s2);}
+.bdg-legal ol li,.bdg-legal ul li{
+  position:relative;padding:7px 0 7px 26px;font-size:var(--t-legal);line-height:1.6;color:var(--muted);
+}
+.bdg-legal ol{counter-reset:legal;}
+.bdg-legal ol li::before{
+  counter-increment:legal;content:counter(legal) ".";
+  position:absolute;left:0;top:7px;color:var(--brass-lit);font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.bdg-legal ul li::before{content:"";position:absolute;left:0;top:17px;width:10px;height:1px;background:var(--brass);}
+.bdg-legal .bdg-feelist{columns:2;column-gap:40px;}
+.bdg-legal .bdg-feelist li{break-inside:avoid;}
+
+/* ---------- 6. Close ------------------------------------------------------ */
+.bdg-close{
+  background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,rgba(178,123,41,.11) 100%);
+  border-top:1px solid var(--line);text-align:center;
+}
+.bdg-close p{
+  font-size:clamp(21px,2.7vw,32px);font-weight:800;letter-spacing:-.02em;line-height:1.25;
+  color:#fff;max-width:28ch;margin:0 auto;text-wrap:balance;
+}
+.bdg-close .bdg-cta-row{justify-content:center;margin-top:var(--s5);}
+
+/* ---------- Responsive ----------------------------------------------------
+   Breakpoints follow the content, not device names: each one fires where a
+   particular block actually stops fitting.
+   1180 hero columns tighten · 1024 four-up grids drop to two · 900 hero stacks
+   860 poster type gets too small to read · 620 everything goes single column
+   380 type and padding step down for the narrowest phones
+   -------------------------------------------------------------------------- */
+@media (max-width:1180px){
+  .bdg-herogrid{gap:var(--s5);}
+  .bdg-legal .bdg-feelist{column-gap:var(--s5);}
+}
+@media (max-width:1024px){
+  .bdg-specs ul{grid-template-columns:repeat(2,1fr);row-gap:var(--s4);}
+  .bdg-specs li:nth-child(3){padding-left:0;border-left:0;}
+}
+@media (max-width:900px){
+  .bdg{--s8:64px;--pad-card:24px;}
+  /* Шапка НЕ перестраивается на узких экранах: иллюстрация остаётся справа
+     от текста и просто сжимается вместе с колонкой. Раньше она уходила
+     наверх отдельным блоком — картинка меняла место, а не размер.
+     Доля колонки уменьшена, чтобы тексту хватало ширины. */
+  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);gap:var(--s4);}
+  .bdg-heroart{max-width:none;margin:0;--art-fit:132%;}
+  .bdg-hero .bdg-cta-row{margin-top:var(--s4);}
+}
+@media (max-width:860px){
+  /* Постер не прячем и не пускаем вбок — он ужимается вместе с колонкой.
+     Мелкий текст на нём на телефоне не прочитать, но это и не нужно: те же
+     четыре шага идут ниже живым текстом в бегущей строке, а сама картинка
+     работает как иллюстрация. */
+  .bdg{--t-label:13px;}
+}
+@media (max-width:620px){
+  /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
+     поэтому на узких экранах ограничиваем её отдельно от десктопных 300px */
+  /* на узком экране шаг уже, чтобы помещаться в кадр целиком */
+  .bdg-ticker li{grid-template-columns:60px minmax(0,1fr);width:262px;}
+
+  .bdg{--s8:48px;--s6:32px;--t-label:13px;}
+  .bdg-wrap{padding:0 var(--s3);}
+  .bdg-specs ul{grid-template-columns:1fr;row-gap:var(--s3);}
+  .bdg-specs li{padding-left:0;border-left:0;}
+  .bdg-ready{gap:var(--s3);}
+  .bdg-legal .bdg-feelist{columns:1;}
+  /* на узком экране ряд разворачивается в столбик, ширина остаётся общей */
+  .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
+}
+@media (max-width:380px){
+  .bdg{--t-body:15px;--t-lead:17px;--pad-card:20px;}
+  .bdg-ticker li{width:238px;}
+  /* «Gun Owners» склеено неразрывным пробелом и не переносится, поэтому
+     на самом узком экране кегль и доля колонки под картинку идут вниз —
+     иначе слово вылезает за свою колонку */
+  .bdg-hero h1{font-size:26px;}
+  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.5fr);gap:var(--s3);}
+  .bdg-legal ol li,.bdg-legal ul li{padding-left:20px;}
+}
+@media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
+</style>
+
+<!-- 1. Welcome -->
+<section class="bdg-hero">
+  <div class="bdg-wrap">
+    <div class="bdg-herogrid">
+      <div>
+        <h1><span>Welcome,</span> <span>Gun&nbsp;Owners</span> <span>of</span> <span>America</span> <span>Members!</span></h1>
+        <div class="bdg-rule"></div>
+        <p class="bdg-lede">Thank you for your continued support of Gun Owners of America and for standing up for our Second Amendment rights.</p>
+        <p class="bdg-eligible">As a GOA member, you&rsquo;re eligible to redeem your <strong>Free Suppressor Rebate</strong>.</p>
+        <div class="bdg-cta-row">
+          <a class="bdg-btn bdg-btn--solid" href="#how-to-redeem">How to Redeem Your Rebate</a>
+          <a class="bdg-btn bdg-btn--ghost" href="https://backdraftsuppressors.com/suppressors/">Shop Suppressors</a>
+        </div>
+      </div>
+      <figure class="bdg-heroart" role="img" aria-label="Outlier 4&Prime; Hunter suppressor, non-magnum">
+        <span class="bdg-art"></span>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Rebate at a glance -->
+<section class="bdg-specs" aria-label="Rebate at a glance">
+  <div class="bdg-wrap">
+    <ul>
+      <li>
+        <span class="bdg-label">Rebate value</span>
+        <span class="bdg-val"><em>$189.99</em></span>
+        <span class="bdg-fine">Applied toward the eligible suppressor</span>
+      </li>
+      <li>
+        <span class="bdg-label">Eligible suppressor</span>
+        <span class="bdg-val">4&Prime; Hunter</span>
+        <span class="bdg-fine">Non-magnum only</span>
+      </li>
+      <li>
+        <span class="bdg-label">Estimated lead time</span>
+        <span class="bdg-val">8&ndash;12 weeks</span>
+        <span class="bdg-fine">After checkout and payment; not guaranteed</span>
+      </li>
+      <li>
+        <span class="bdg-label">Code validity</span>
+        <span class="bdg-val">1 year</span>
+        <span class="bdg-fine">From the date it is received or issued</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 3. How to Redeem Your Rebate -->
+<section class="bdg-steps" id="how-to-redeem">
+  <div class="bdg-wrap">
+    <p class="bdg-label">Four steps</p>
+    <h2>How to Redeem Your <em>Rebate</em></h2>
+    <p class="bdg-sub">Use your rebate code at checkout to redeem your 4&Prime; Hunter Suppressor (non-magnum).</p>
+
+    <figure class="bdg-poster">
+      <img src="assets/redemption-infographic.webp" width="1300" height="867" alt="Four steps to redeem your free suppressor rebate: visit BackdraftSuppressors.com, select your free 4-inch Hunter Suppressor (non-magnum), add the required HUB thread adapter, then enter your rebate code at checkout." loading="lazy">
+    </figure>
+
+    <figure class="bdg-reel" aria-label="The four redemption steps">
+      <div class="bdg-reel-bar">
+        <span class="bdg-reel-label"><i></i>How it works</span>
+        <span class="bdg-reel-time">Four steps</span>
+      </div>
+      <div class="bdg-ticker">
+        <ol class="bdg-ticker-track">
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">1</span><h3>Visit the Website</h3></div>
+              <p>Start your rebate redemption online at <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">2</span><h3>Select Your Suppressor</h3></div>
+              <p>Choose your free <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter Suppressor</a> (non-magnum).</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">3</span><h3>Add Required HUB Adapter<span class="bdg-ast">*</span></h3></div>
+              <p>Select the required <a href="https://backdraftsuppressors.com/adapters/">HUB thread adapter</a> for your suppressor.</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">4</span><h3>Enter Your Rebate Code</h3></div>
+              <p>Apply your code at checkout.</p>
+            </div>
+          </li>
+        </ol>
+        <ol class="bdg-ticker-track" aria-hidden="true">
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">1</span><h3>Visit the Website</h3></div>
+              <p>Start your rebate redemption online at <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">2</span><h3>Select Your Suppressor</h3></div>
+              <p>Choose your free <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter Suppressor</a> (non-magnum).</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">3</span><h3>Add Required HUB Adapter<span class="bdg-ast">*</span></h3></div>
+              <p>Select the required <a href="https://backdraftsuppressors.com/adapters/">HUB thread adapter</a> for your suppressor.</p>
+            </div>
+          </li>
+          <li>
+            <span class="bdg-reel-art"></span>
+            <div>
+              <div class="bdg-stephead"><span class="bdg-stepnum">4</span><h3>Enter Your Rebate Code</h3></div>
+              <p>Apply your code at checkout.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </figure>
+
+    <div class="bdg-ready">
+      <div>
+        <h3>Ready to Redeem?</h3>
+        <p>Choose your 4&Prime; Hunter Suppressor, add the required HUB Adapter, and enter your rebate code at checkout.</p>
+      </div>
+      <a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem Your Suppressor Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Please note -->
+<section class="bdg-note">
+  <div class="bdg-wrap">
+    <div class="bdg-notecard">
+      <h2><span class="bdg-ast">*</span>Please note:</h2>
+      <p>Shipping/Handling, the required HUB Adapter, applicable taxes, transfer taxes, and any FFL/SOT or ATF/NFA-related fees are the responsibility of the customer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Terms and Conditions -->
+<section class="bdg-legal" id="rebate-terms">
+  <div class="bdg-wrap">
+    <div class="bdg-ack">
+      <h3>Customer Acknowledgement:</h3>
+      <p>By redeeming this rebate, the customer acknowledges and agrees to the Backdraft Suppressors Free Suppressor Rebate Terms and Conditions below, including all items marked with an asterisk above. The customer understands that the rebate applies to the eligible suppressor only and does not include the HUB Adapter, shipping/handling, applicable taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT transfer fees, or any other required fees. The customer further understands that the estimated 8&ndash;12 week lead time is not guaranteed and may be extended without notice.</p>
+    </div>
+
+    <p class="bdg-label">The fine print</p>
+    <p class="bdg-doctitle">Backdraft Suppressors Free Suppressor Rebate &mdash; Customer Acknowledgement of Required Rebate Terms</p>
+    <h2>Terms and Conditions</h2>
+
+    <div class="bdg-legalintro">
+      <p>The <strong>Backdraft Suppressors Free Suppressor Rebate</strong> allows eligible customers to redeem a qualifying rebate code toward one eligible 4&Prime; Hunter Suppressor, non-magnum only, through BackdraftSuppressors.com, subject to these Terms and Conditions, product availability, legal eligibility, and all applicable federal, state, and local laws.</p>
+      <p>The rebate may be received through various qualifying sources, including but not limited to eligible purchases from GetOutlier.com, participating dealers, promotional offers, product bundles, rebate cards, order inserts, digital codes, or other approved promotional channels. Regardless of how the rebate code is received, the rebate terms remain the same.</p>
+    </div>
+
+    <h3>Important Customer Responsibility Notice</h3>
+    <p class="bdg-strong">The rebate applies to the eligible suppressor only.</p>
+    <p>The HUB Adapter is not included. Shipping/handling is not included. Applicable taxes are not included. Transfer fees are not included. Any ATF, NFA, FFL, SOT, state, local, sales tax, transfer tax, or other required fees are the responsibility of the customer.</p>
+    <p>By redeeming a rebate code, the customer acknowledges and agrees that additional charges may be due at checkout and/or through the selected FFL/SOT dealer before the suppressor can be legally transferred.</p>
+
+    <h3>Eligible Rebate Item</h3>
+    <p>Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor, non-magnum only.</p>
+    <p>The stated rebate value is <strong>$189.99</strong>. Customers may apply the rebate value toward an eligible upgrade or alternate suppressor option where available, and the customer is responsible for paying any difference in price, along with all required accessories, shipping/handling, taxes, transfer-related fees, and any other applicable charges.</p>
+    <p>All models, calibers, finishes, configurations, and upgrade options are subject to availability.</p>
+
+    <h3>Rebate Code Use</h3>
+    <p>Each rebate code is valid for one suppressor redemption only. There is no limit on the number of rebate codes a customer may redeem, provided each rebate code is valid, unused, and redeemed according to these Terms and Conditions.</p>
+    <p>For example, if a customer has multiple valid rebate codes, each code may be redeemed separately for one eligible suppressor per code.</p>
+    <p>Rebate codes may be transferred or gifted to another eligible person. Rebate codes may not be fraudulently generated, duplicated, altered, counterfeited, or used in any unauthorized manner.</p>
+    <p>Rebate codes have no cash value and may not be redeemed for cash, store credit, refund, or any monetary payment.</p>
+
+    <h3>Rebate Expiration</h3>
+    <p>Each rebate code is valid for <strong>one year from the date it is received or issued</strong>, unless a different expiration date is printed, displayed, assigned, or otherwise communicated with the rebate code.</p>
+    <p>Expired rebate codes are void and will not be honored.</p>
+
+    <h3>How to Redeem</h3>
+    <p>To redeem a valid rebate code, the customer must:</p>
+    <ol>
+      <li>Visit BackdraftSuppressors.com.</li>
+      <li>Select an eligible 4&Prime; Hunter Suppressor, non-magnum only, or eligible upgrade where available.</li>
+      <li>Add the required HUB Adapter.</li>
+      <li>Enter the rebate code at checkout.</li>
+      <li>Pay all required charges, including any upgrade cost, HUB Adapter, shipping/handling, taxes, transfer-related fees, and any other applicable charges.</li>
+      <li>Complete all required FFL/SOT, ATF/NFA, federal, state, and local transfer requirements.</li>
+    </ol>
+    <p>Incomplete redemptions, invalid codes, expired codes, duplicate codes, or redemptions that do not comply with these Terms and Conditions may be denied, cancelled, or voided.</p>
+
+    <h3>Required HUB Adapter</h3>
+    <p class="bdg-strong">A compatible HUB Adapter is required and is not included in the free suppressor rebate.</p>
+    <p>The customer is responsible for selecting and purchasing the appropriate HUB Adapter for their suppressor, firearm, barrel threading, and intended setup. Customers should verify compatibility before completing their order, installing the adapter, or using the suppressor.</p>
+
+    <h3>Customer Fees, Taxes, and Transfer Costs</h3>
+    <p class="bdg-strong">The customer is responsible for all charges not expressly included in the rebate.</p>
+    <p>These may include, but are not limited to:</p>
+    <ul class="bdg-feelist">
+      <li>HUB Adapter cost</li>
+      <li>Shipping and handling</li>
+      <li>Sales tax</li>
+      <li>State or local taxes</li>
+      <li>Transfer taxes, where applicable</li>
+      <li>ATF/NFA-related fees, where applicable</li>
+      <li>FFL/SOT transfer fees</li>
+      <li>Dealer processing fees</li>
+      <li>Storage fees</li>
+      <li>Any other transfer-related, governmental, or third-party fees</li>
+    </ul>
+    <p>Taxes and fees may be calculated based on the full value of the suppressor, the HUB Adapter, any upgraded item, and/or any other products included in the order.</p>
+    <p>Fees charged by a receiving FFL/SOT or other third party are separate from BackdraftSuppressors.com and remain the sole responsibility of the customer.</p>
+
+    <h3>FFL/SOT Transfer Process</h3>
+    <p class="bdg-strong">Suppressors are regulated items and must be transferred in accordance with all applicable laws.</p>
+    <p>Outlier USA / Backdraft Suppressors will transfer the suppressor to the customer&rsquo;s selected FFL/SOT through the required transfer process. The customer is responsible for selecting a qualified FFL/SOT and completing all required transfer paperwork, approvals, background checks, tax payments, fees, and legal requirements necessary to receive the suppressor.</p>
+    <p>The customer is responsible for all fees charged by the selected FFL/SOT, including any transfer, processing, storage, or administrative fees.</p>
+    <p>Redemption of a rebate code does not guarantee that the customer is legally eligible to receive or possess a suppressor. If the customer is not legally eligible, if the selected FFL/SOT cannot complete the transfer, or if the transfer is prohibited by law, the redemption may be cancelled or denied.</p>
+
+    <h3>Lead Time and Fulfillment</h3>
+    <p class="bdg-strong">The current estimated lead time is 8&ndash;12 weeks after checkout and payment are completed.</p>
+    <p>This timeline is an estimate only and is not a guaranteed delivery date, shipping date, transfer date, or approval date. Due to demand, production volume, supplier delays, regulatory transfer requirements, FFL/SOT processing, ATF/NFA processing, carrier delays, or other operational factors, lead times may be extended automatically without notice.</p>
+    <p>Customers acknowledge that Outlier USA / Backdraft Suppressors is currently experiencing extended fulfillment timelines and that actual delivery or transfer may take longer than the estimated 8&ndash;12 week period.</p>
+    <p>Customer updates may be limited during the production and transfer process. Customers should expect to receive an order confirmation and a shipping notification when the item ships to the selected FFL/SOT.</p>
+
+    <h3>Availability and Substitutions</h3>
+    <p>All suppressors, accessories, HUB Adapters, finishes, calibers, configurations, and upgrade options are subject to availability.</p>
+    <p>Outlier USA and Backdraft Suppressors reserve the right to modify, substitute, delay, discontinue, or replace any promotional item with an item of equal or greater value if necessary due to inventory, production, regulatory, supplier, or operational considerations.</p>
+    <p>Product images, descriptions, finishes, and promotional materials are for general reference and may vary from the final product received.</p>
+
+    <h3>No Stacking or Cash Redemption</h3>
+    <p>Unless expressly permitted in writing by Outlier USA / Backdraft Suppressors, rebate codes may not be combined with other rebates, discounts, coupons, credits, promotional offers, dealer offers, or special pricing.</p>
+    <p>Rebate codes are not redeemable for cash, credit, refund, or any monetary value.</p>
+
+    <h3>Returns, Cancellations, and Refunds</h3>
+    <p>Due to the regulated nature of suppressors and the ATF/NFA transfer process, suppressors are not eligible for return, exchange, or refund once the order, production, shipment, transfer, or paperwork process has begun, except where expressly required by law.</p>
+    <p>If a qualifying purchase that resulted in the issuance of a rebate code is returned, cancelled, charged back, refunded, or otherwise reversed, Outlier USA / Backdraft Suppressors may cancel the related rebate code, void the redemption, reduce any refund by the rebate value, or seek recovery of the promotional value received.</p>
+    <p>If a rebate has already been redeemed, the customer may be responsible for the rebate value, related charges, fees, costs, or any other amounts associated with the redemption.</p>
+
+    <h3>Eligibility and Legal Compliance</h3>
+    <p>This promotion is available only to eligible U.S. customers located in jurisdictions where suppressors are legal.</p>
+    <p>This promotion is not available in Alaska, in any state or jurisdiction where suppressors are prohibited, or where the promotion is otherwise restricted, taxed in a way that makes the promotion unavailable, or prohibited by law.</p>
+    <p class="bdg-strong">Void where prohibited, restricted, or otherwise unavailable by federal, state, or local law.</p>
+    <p>It is the customer&rsquo;s sole responsibility to understand and comply with all applicable federal, state, and local laws before redeeming a rebate code, purchasing a HUB Adapter, selecting an FFL/SOT, or attempting to receive a suppressor.</p>
+
+    <h3>Misuse, Fraud, and Revocation</h3>
+    <p>Outlier USA and Backdraft Suppressors reserve the right to deny, cancel, suspend, revoke, or void any rebate code, redemption, order, or promotion for any reason, including but not limited to suspected misuse, fraud, duplicate redemption, unauthorized code generation, code alteration, resale abuse, ineligibility, chargebacks, returned qualifying purchases, violation of these Terms and Conditions, or violation of applicable law.</p>
+    <p>Remedies may include cancellation of orders, voiding of rebate codes, denial of redemption, reduced refunds, suspension of account privileges, and any other legal, contractual, or equitable remedies available.</p>
+
+    <h3>Program Changes</h3>
+    <p>Outlier USA and Backdraft Suppressors reserve the right to modify, suspend, extend, or terminate the Backdraft Suppressors Free Suppressor Rebate program at any time without prior notice.</p>
+    <p>Changes may include, but are not limited to, rebate value, eligible products, upgrade options, redemption process, expiration rules, lead times, fulfillment process, available inventory, required accessories, fees, or these Terms and Conditions.</p>
+
+    <h3>Errors and Technical Issues</h3>
+    <p>Outlier USA and Backdraft Suppressors are not responsible for typographical errors, pricing errors, image errors, technical issues, website errors, checkout errors, unavailable network connections, interrupted service, incorrect customer information, invalid FFL/SOT information, shipping carrier delays, or third-party processing issues.</p>
+
+    <h3>Severability</h3>
+    <p>If any provision of these Terms and Conditions is found to be invalid, unlawful, or unenforceable, the remaining provisions will remain in full force and effect.</p>
+  </div>
+</section>
+
+<!-- 6. Close -->
+<section class="bdg-close">
+  <div class="bdg-wrap">
+    <p>We appreciate your support and are proud to offer this exclusive benefit to fellow Second Amendment supporters.</p>
+    <div class="bdg-cta-row">
+      <a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem Your Rebate</a>
+      <a class="bdg-btn bdg-btn--ghost" href="https://backdraftsuppressors.com/">Visit the Website</a>
+    </div>
+  </div>
+</section>
+
+
+</div>
