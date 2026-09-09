@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Backdraft Suppressors — Partner Landing Pages</title>
+<meta name="robots" content="noindex">
+<!-- Страница-указатель для GitHub Pages: сами лендинги лежат в partners/.
+     Держим её тонкой и без картинок, чтобы не дублировать 300 КБ в истории. -->
+<style>
+  :root{--ink:#26262A;--ink-2:#332F29;--text:#EDEDEC;--muted:#B2AFA8;--brass:#BD8531;--brass-lit:#E3B25F;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:32px;
+       background:linear-gradient(180deg,var(--ink),var(--ink-2));color:var(--text);
+       font:16px/1.6 Manrope,"Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  main{width:100%;max-width:520px}
+  p.eyebrow{margin:0;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--brass-lit)}
+  h1{margin:12px 0 0;font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.02em;line-height:1.15;text-wrap:balance}
+  p.lede{margin:12px 0 0;color:var(--muted)}
+  ul{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:10px}
+  a.item{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+         padding:16px 18px;border:1px solid rgba(255,255,255,.15);border-radius:2px;
+         color:var(--text);text-decoration:none;transition:border-color .18s,color .18s}
+  a.item:hover,a.item:focus-visible{border-color:var(--brass);color:var(--brass-lit)}
+  a.item span.who{font-weight:700}
+  a.item span.url{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+  a.item:hover span.url{color:inherit}
+  li.soon{padding:16px 18px;border:1px dashed rgba(255,255,255,.12);border-radius:2px;color:var(--muted);font-size:14px}
+  footer{margin-top:28px;font-size:13px;color:var(--muted)}
+  footer a{color:var(--brass-lit)}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Backdraft Suppressors</p>
+  <h1>Partner landing pages</h1>
+  <p class="lede">Превью страниц до публикации в магазине. Каждая — один самодостаточный файл, который вставляется в BigCommerce.</p>
+  <ul>
+    <li><a class="item" href="partners/goa/bigcommerce-page.html">
+      <span class="who">Gun Owners of America</span><span class="url">backdraftsuppressors.com/GOA</span></a></li>
+    <li class="soon">Burris Optics — не начато</li>
+    <li class="soon">Meprolight Optics — не начато</li>
+    <li class="soon">MasterFFL — не начато</li>
+  </ul>
+  <footer>Исходники и инструкция по публикации — в <a href="https://github.com/Marynawind/backdraft-partner-landings">репозитории</a>.</footer>
+</main>
+</body>
+</html>
