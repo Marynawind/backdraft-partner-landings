@@ -303,6 +303,36 @@ figure.bdg-poster{margin-top:var(--s5);position:relative;}
 .bdg-hot{position:absolute;display:block;border-radius:3px;}
 .bdg-hot:hover{background:rgba(226,178,95,.16);}
 .bdg-hot:focus-visible{outline:2px solid var(--brass-lit);outline-offset:2px;}
+
+/* ---------- Узкий экран: шаги и полоса живым текстом ------------------------
+   Картинка тянется по ширине окна, поэтому её текст уменьшается вместе с ней:
+   на телефоне прописная выходит около 6 px и не читается. Ниже 700 px картинка
+   обрезается до шапки (логотип, заголовок, подпись, линейка) через object-fit,
+   а шаги и полоса идут живым текстом — он тянется по ширине, читается при
+   любом кегле и несёт настоящие ссылки. Второго файла картинки для этого не
+   нужно: обрезка чисто на CSS, лишних байтов не добавляет.
+   Высоту шапки подставляет build.py из assets/poster-map.json — она меняется
+   вместе с раскладкой картинки. */
+.bdg-steplist,.bdg-perks{display:none;}
+ol.bdg-steplist{margin-top:var(--s5);counter-reset:step;}
+.bdg-steplist li{
+  display:grid;grid-template-columns:34px minmax(0,1fr);gap:var(--s3);
+  align-items:baseline;padding:var(--s3) 0;border-top:1px solid var(--line-soft);
+}
+.bdg-steplist li:last-child{border-bottom:1px solid var(--line-soft);}
+.bdg-steplist li::before{
+  counter-increment:step;content:counter(step);
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:var(--brass);color:#15100A;
+  font-size:var(--t-micro);font-weight:800;font-variant-numeric:tabular-nums;
+  transform:translateY(4px);
+}
+.bdg-steplist p{font-size:var(--t-lead);color:var(--text);line-height:1.5;}
+.bdg-steplist a{color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--brass);}
+.bdg-perks{margin-top:var(--s5);gap:var(--s4);}
+.bdg-perks > div{padding-top:var(--s3);border-top:1px solid var(--line-soft);}
+.bdg-perks h3{font-size:var(--t-micro);letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:var(--s1);}
+.bdg-perks p{font-size:var(--t-body);color:var(--muted);line-height:1.5;}
 .bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
 
 /* ---------- Ролик «как это работает» ---------------------------------------
@@ -414,6 +444,15 @@ figure.bdg-poster{margin-top:var(--s5);position:relative;}
   /* на узком экране ряд разворачивается в столбик, ширина остаётся общей */
   .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
 }
+@media (max-width:700px){
+  /* картинка обрезается до шапки: остальное её содержимое ниже живым текстом */
+  .bdg-poster img{aspect-ratio:POSTER_HEAD_RATIO;object-fit:cover;object-position:center top;}
+  /* области клика считаны от полной картинки и на обрезанной не совпадут,
+     а живой текст ниже несёт те же ссылки настоящими */
+  .bdg-hot{display:none;}
+  .bdg-steplist{display:grid;}
+  .bdg-perks{display:grid;}
+}
 @media (max-width:380px){
   .bdg{--t-body:15px;--t-lead:17px;--pad-card:20px;}
   /* «Gun Owners» склеено неразрывным пробелом и не переносится, поэтому
@@ -460,6 +499,29 @@ figure.bdg-poster{margin-top:var(--s5);position:relative;}
       <img src="assets/redemption-infographic.webp" width="1300" height="1052" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor: Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
       <!--poster-links-->
     </figure>
+
+    <ol class="bdg-steplist">
+      <li><p>Visit <a href="https://backdraftsuppressors.com/">BackdraftSuppressors.com</a></p></li>
+      <li><p>Select a <a href="https://backdraftsuppressors.com/backdraft-hunter/">4&Prime; Hunter</a>, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost.</p></li>
+      <li><p>Select the required <a href="https://backdraftsuppressors.com/adapters/">HUB Adapter</a>.</p></li>
+      <li><p>Enter the rebate code at checkout.</p></li>
+      <li><p>Select your preferred FFL/SOT for suppressor transfer.</p></li>
+      <li><p>Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes.</p></li>
+    </ol>
+
+    <div class="bdg-perks">
+      <div>
+        <h3>Want more performance?</h3>
+        <p>Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance.</p>
+      </div>
+      <div>
+        <h3>Go full auto. Go stainless.</h3>
+        <p>Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use.</p>
+      </div>
+      <div>
+        <p>Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply.<span class="bdg-ast">*</span></p>
+      </div>
+    </div>
 
     <div class="bdg-notecard">
       <h2><span class="bdg-ast">*</span>Please note:</h2>

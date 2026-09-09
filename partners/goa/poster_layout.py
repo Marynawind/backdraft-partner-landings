@@ -82,7 +82,8 @@ LINKS = {
     2: ('4" Hunter', "https://backdraftsuppressors.com/backdraft-hunter/"),
     3: ("HUB Adapter", "https://backdraftsuppressors.com/adapters/"),
 }
-LINK_MAP = HERE / "assets" / "link-map.json"
+POSTER_MAP = HERE / "assets" / "poster-map.json"
+HEAD_BOTTOM = 502                  # низ шапки: логотип, заголовок, подпись, линейка
 UNDERLINE = (6, 2)                 # отступ от базовой линии и толщина
 HOT_PAD = 10                       # запас рамки клика вокруг слова
 
@@ -267,13 +268,16 @@ def compose(poster: Image.Image, strip_src: Image.Image) -> Image.Image:
             if s[0] or s[1] or s[2]:
                 d = px[xx, yy]
                 px[xx, yy] = tuple(255 - (255 - d[i]) * (255 - s[i]) // 255 for i in range(3))
-    LINK_MAP.write_text(json.dumps(
-        [{"href": h["href"], "label": h["label"],
-          "left": round(h["box"][0] / poster.width * 100, 3),
-          "top": round(h["box"][1] / poster.height * 100, 3),
-          "width": round(h["box"][2] / poster.width * 100, 3),
-          "height": round(h["box"][3] / poster.height * 100, 3)} for h in hotspots],
-        ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    POSTER_MAP.write_text(json.dumps({
+        # шапка, до которой картинка обрезается на узком экране
+        "head": {"w": poster.width, "h": HEAD_BOTTOM},
+        "steps": STEPS,
+        "links": [{"href": h["href"], "label": h["label"],
+                   "left": round(h["box"][0] / poster.width * 100, 3),
+                   "top": round(h["box"][1] / poster.height * 100, 3),
+                   "width": round(h["box"][2] / poster.width * 100, 3),
+                   "height": round(h["box"][3] / poster.height * 100, 3)} for h in hotspots],
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     missing = [p for i, (p, _) in LINKS.items() if not any(h["label"] == p for h in hotspots)]
     assert not missing, f"слово для ссылки не найдено в наборе: {missing}"
     print(f"  ссылок поверх картинки: {len(hotspots)} ({', '.join(h['label'] for h in hotspots)})")

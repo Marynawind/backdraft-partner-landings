@@ -25,8 +25,9 @@ import re
 
 HERE = pathlib.Path(__file__).parent
 PAGE = HERE / "page.src.html"
-LINK_MAP = HERE / "assets" / "link-map.json"
+POSTER_MAP = HERE / "assets" / "poster-map.json"
 LINK_MARKER = "<!--poster-links-->"
+HEAD_MARKER = "POSTER_HEAD_RATIO"
 
 PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 <style>
@@ -39,13 +40,33 @@ PREVIEW_HEAD = """<title>GOA Member Rebate</title>
 PREVIEW_FOOT = '<div class="mock-footer">&copy; 2026 Backdraft Suppressors &mdash; preview mock of the store footer</div>\n'
 
 
-def poster_links(page: str) -> str:
-    """Разложить прозрачные <a> поверх инфографики по карте от poster_layout."""
+def poster(page: str) -> str:
+    """Подставить всё, что зависит от раскладки инфографики.
+
+    Карту пишет poster_layout.py при сборке картинки: доли рамок клика, высоту
+    шапки для обрезки на узком экране и сам текст шагов. Текст сверяется с живым
+    списком на странице — он показывается вместо картинки на узких экранах,
+    и разъехаться эти два набора не должны.
+    """
     if page.count(LINK_MARKER) != 1:
         raise SystemExit(f"{LINK_MARKER} must appear exactly once in page.src.html")
-    spots = json.loads(LINK_MAP.read_text(encoding="utf-8"))
+    if page.count(HEAD_MARKER) != 1:
+        raise SystemExit(f"{HEAD_MARKER} must appear exactly once in page.src.html")
+    m = json.loads(POSTER_MAP.read_text(encoding="utf-8"))
+    spots = m["links"]
     if not spots:
-        raise SystemExit("link-map.json is empty — run tools-cutout.py first")
+        raise SystemExit("poster-map.json has no links — run tools-cutout.py first")
+
+    live = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", li))).strip()
+            for li in re.findall(r"<li><p>(.*?)</p></li>", page, re.S)]
+    baked = [s.replace("\u2033", '"') for s in m["steps"]]
+    live_cmp = [s.replace("\u2033", '"') for s in live]
+    if live_cmp != baked:
+        pairs = [f"\n  картинка: {b}\n  страница: {l}"
+                 for b, l in zip(baked, live_cmp + [""] * len(baked)) if b != l]
+        raise SystemExit("шаги на странице разошлись с шагами в картинке:" + "".join(pairs))
+
+    page = page.replace(HEAD_MARKER, f'{m["head"]["w"]}/{m["head"]["h"]}')
     tags = "\n".join(
         '      <a class="bdg-hot" href="{href}" aria-label="{label}"'
         ' style="left:{left}%;top:{top}%;width:{width}%;height:{height}%"></a>'.format(
@@ -53,7 +74,8 @@ def poster_links(page: str) -> str:
             left=s["left"], top=s["top"], width=s["width"], height=s["height"])
         for s in spots)
     print(f"  {len(spots)} ссылок поверх инфографики: "
-          + ", ".join(s["label"] for s in spots))
+          + ", ".join(s["label"] for s in spots)
+          + f"; шаги на странице сверены с картинкой ({len(baked)})")
     return page.replace(LINK_MARKER, tags.strip())
 
 
@@ -79,7 +101,7 @@ def inline(page: str) -> str:
 
 
 if __name__ == "__main__":
-    standalone = inline(poster_links(PAGE.read_text(encoding="utf-8")))
+    standalone = inline(poster(PAGE.read_text(encoding="utf-8")))
     for name, body in (("bigcommerce-page.html", standalone),
                        ("preview.html", PREVIEW_HEAD + standalone + PREVIEW_FOOT)):
         out = HERE / name
