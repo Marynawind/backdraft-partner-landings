@@ -135,6 +135,9 @@
   margin-bottom:var(--s6);
 }
 .bdg-cobrand img{width:clamp(148px,17vw,196px);height:auto;}
+/* Доля колонок ОДНА на все ширины: иллюстрация всегда справа от текста и
+   уменьшается вместе с ним, а не меняет место и не меняет пропорцию.
+   Зазор задан плавной переменной, поэтому тоже сжимается ровно. */
 .bdg-herogrid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:var(--s6);align-items:center;}
 .bdg-hero h1{font-size:var(--t-h1);color:#fff;}
 .bdg-rule{width:80px;height:3px;background:var(--brass);margin-top:var(--s4);}
@@ -194,7 +197,10 @@
    занимает лишь две трети бокса. На широком экране это воздух, на узком —
    картинка теряется, и её масштаб приходится задавать отдельно. Размер живёт
    в переменной: его читают фон, маска и маска блика, и разойтись им нельзя. */
-.bdg-heroart{position:relative;--art-fit:contain;}
+/* 132% и на десктопе тоже: у файла около 16% пустых полей с каждой стороны,
+   при contain рисунок занимал бы две трети бокса. Значение одно на все
+   ширины — иначе размер рисунка скакал бы на границе медиа-запроса. */
+.bdg-heroart{position:relative;--art-fit:132%;}
 .bdg-heroart .bdg-art{
   display:block;width:100%;aspect-ratio:1/1;
   background:var(--art) center/var(--art-fit) no-repeat;
@@ -370,18 +376,8 @@ figure.bdg-poster{position:relative;}
    860 poster type gets too small to read · 620 everything goes single column
    380 type and padding step down for the narrowest phones
    -------------------------------------------------------------------------- */
-@media (max-width:1180px){
-  .bdg-herogrid{gap:var(--s5);}
-}
 @media (max-width:900px){
   .bdg{--pad-card:24px;}
-  /* Шапка НЕ перестраивается на узких экранах: иллюстрация остаётся справа
-     от текста и просто сжимается вместе с колонкой. Раньше она уходила
-     наверх отдельным блоком — картинка меняла место, а не размер.
-     Доля колонки уменьшена, чтобы тексту хватало ширины. */
-  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.62fr);gap:var(--s4);}
-  .bdg-heroart{max-width:none;margin:0;--art-fit:132%;}
-  .bdg-hero .bdg-cta-row{margin-top:var(--s4);}
 }
 @media (max-width:620px){
   /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
@@ -392,15 +388,6 @@ figure.bdg-poster{position:relative;}
      уменьшается вместе с окном. */
   .bdg-legal p{max-width:none;}
   .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
-  /* На телефоне две колонки не работают: иллюстрация держала 38% ширины,
-     заголовок ломался на четыре строки, у абзацев оставалась пустота справа,
-     кнопки выходили короче полосы. Урезать её долю тоже нельзя — картинка
-     превращается в точку. Поэтому на узком экране шапка становится одной
-     колонкой, а иллюстрация уходит ПОД кнопки отдельным блоком и там снова
-     нормального размера. Именно под, а не над: наверх она когда-то прыгала,
-     и клиент просил так не делать. */
-  .bdg-herogrid{grid-template-columns:minmax(0,1fr);}
-  .bdg-heroart{margin:var(--s5) auto 0;max-width:min(280px,66vw);}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
@@ -416,7 +403,6 @@ figure.bdg-poster{position:relative;}
   /* «Gun Owners» склеено неразрывным пробелом и не переносится, поэтому
      на самом узком экране кегль идёт вниз — иначе слово вылезает за колонку */
   .bdg-hero h1{font-size:28px;}
-  .bdg-herogrid{gap:var(--s3);}
 }
 @media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
 </style>
