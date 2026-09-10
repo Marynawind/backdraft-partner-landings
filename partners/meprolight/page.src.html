@@ -1,0 +1,540 @@
+<!-- ==========================================================================
+     Backdraft Suppressors — Meprolight Optics landing page
+     Target URL: backdraftsuppressors.com/Meprolight
+     Paste this whole block into the BigCommerce page's HTML source view.
+
+     Copy: welcome text per the client brief; redemption steps, fine print and
+     imagery reproduced from getoutlier.com/redemption.
+     All CSS is scoped under .bdg so it cannot leak into the Stencil theme.
+     Images are hot-linked from the Outlier CDN — see DEPLOY.md to re-host them
+     on the BigCommerce CDN.
+     ========================================================================== -->
+<div class="bdg">
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+.bdg{
+  /* surfaces
+     The page runs ONE continuous vertical ramp — deep cool black at the top,
+     warm brass-tinted charcoal at the bottom. So section backgrounds are
+     translucent tints rather than opaque colours: an opaque block would punch
+     a flat hole in the ramp. Same reason the lines are rgba, not hex — a fixed
+     grey disappears against the lighter bottom. */
+  --lift:rgba(255,255,255,.05);
+  --recess:rgba(0,0,0,.11);
+  --art:url("assets/step-2-suppressor.webp");   /* шапка и шаг 2 ролика — один файл */
+  --line:rgba(255,255,255,.15);
+  --line-soft:rgba(255,255,255,.08);
+  /* type colours */
+  --text:#EDEDEC;
+  --muted:#B2AFA8;
+  --brass:#BD8531;
+  --brass-lit:#E3B25F;
+  /* type scale */
+  --f:"Manrope","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --t-label:clamp(13px,.256vw + 12.03px,15px);
+  --t-legal:clamp(15px,.385vw + 13.54px,18px);
+  --t-body:clamp(16px,.385vw + 14.54px,19px);
+  --t-card:22px;
+  --t-h1:clamp(36px,4.9vw,64px);
+  /* spacing scale */
+  --s1:8px;  --s2:12px; --s3:16px; --s4:24px;
+  --s5:32px; --s6:clamp(32px,2.05vw + 24.2px,48px); --s8:clamp(48px,4.1vw + 32.4px,80px);
+  --pad-card:28px;
+  --radius:2px;
+
+  font-family:var(--f);
+  color:var(--text);
+  /* Построено на графите магазина (#333333), а не на чёрном: сверху графит
+     глубже, к низу светлеет и теплеет латунью. Светлее чёрного примерно на
+     30 уровней, поэтому вся светлая типографика ниже пересчитана — на графите
+     прежние тона не вытягивали AA. */
+  background:linear-gradient(180deg,
+    #26262A  0%,
+    #2A2A2E 12%,
+    #2E2E31 26%,
+    #323231 42%,
+    #363431 58%,
+    #3A3731 74%,
+    #3D3A32 88%,
+    #403C33 100%);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  margin:0 calc(50% - 50vw);
+  width:100vw;
+  max-width:100vw;
+  overflow-x:hidden;
+}
+.bdg *,.bdg *::before,.bdg *::after{box-sizing:border-box;}
+/* ⚠️ Сброс задан по типу элемента, поэтому он специфичнее (0,1,1) любого
+   правила по одному классу (0,1,0) и молча съедает у них margin и padding.
+   Любому figure/ol/ul/li со своими отступами селектор пишем с именем тега,
+   например figure.bdg-poster. */
+.bdg p,.bdg h1,.bdg h2,.bdg h3,.bdg h4,.bdg ul,.bdg ol,.bdg li,.bdg figure{margin:0;padding:0;}
+.bdg ul,.bdg ol{list-style:none;}
+.bdg img{display:block;max-width:100%;height:auto;}
+.bdg h1,.bdg h2,.bdg h3,.bdg h4{font-weight:800;letter-spacing:-.02em;line-height:1.1;text-wrap:balance;}
+.bdg a:focus-visible{outline:2px solid var(--brass-lit);outline-offset:3px;}
+
+.bdg-wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 var(--s4);}
+
+/* every section shares one vertical rhythm */
+.bdg-hero,.bdg-steps,.bdg-legal,.bdg-close{padding:var(--s8) 0 84px;}
+
+/* buttons */
+.bdg-btn{
+  display:inline-flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--f);font-size:var(--t-body);font-weight:700;
+  padding:var(--s3) var(--s5);border:1px solid var(--brass);border-radius:var(--radius);
+  text-decoration:none;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+.bdg-btn--solid{background:var(--brass);color:#15100A;}
+.bdg-btn--solid:hover,.bdg-btn--solid:focus-visible{background:var(--brass-lit);border-color:var(--brass-lit);color:#15100A;}
+.bdg-btn--ghost{background:transparent;color:var(--text);border-color:var(--line);}
+.bdg-btn--ghost:hover,.bdg-btn--ghost:focus-visible{border-color:var(--brass);color:var(--brass-lit);}
+/* Кнопки в ряду одного размера, а не по длине надписи: колонки сетки равны,
+   minmax(0,1fr) не даёт длинному тексту растянуть свою колонку. */
+.bdg-cta-row{
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  /* и по высоте тоже: в столбике одна надпись переносится на две строки,
+     а другая нет — 1fr выравнивает ряды между собой */
+  grid-auto-rows:1fr;gap:var(--s2);
+}
+.bdg-cta-row .bdg-btn{width:100%;}
+
+/* one card recipe, used by every boxed block */
+.bdg-ready,.bdg-notecard{
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:var(--pad-card);
+}
+.bdg-ready,.bdg-notecard{background:var(--lift);border-left:3px solid var(--brass);}
+
+/* line art ships as a transparent cut-out (see tools-cutout.py), so it needs no
+   blend mode — which is what frees its wrapper to carry a transform */
+.bdg-art{filter:drop-shadow(0 0 24px rgba(178,123,41,.22));}
+
+/* ---------- 1. Welcome --------------------------------------------------- */
+.bdg-hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(110% 80% at 8% 0%, rgba(178,123,41,.20) 0%, rgba(178,123,41,0) 55%);
+  border-bottom:1px solid var(--line);
+}
+.bdg-hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 104px);
+}
+.bdg-hero .bdg-wrap{position:relative;z-index:1;}
+/* Логотип партнёра наверху страницы, чтобы клиент Meprolight сразу узнал,
+   куда попал. Логотип ВШИТ в файл, а не подтянут с meprolight.com: страница
+   обязана быть самодостаточной, а хотлинк чужого CDN вдобавок ненадёжен
+   и грузит их трафик. Взята белая версия — страница тёмная.
+   Исходники: assets/source/meprolight-logo.svg (белая, ею и пользуемся)
+   и meprolight-logo-dark.svg (тёмная, на случай светлого фона).
+   В отличие от GOA и MasterFFL здесь вшит НЕ растр, а сам вектор: файл весит
+   6,6 КБ — меньше любого разумного растра, и подпись «SK GROUP MEMBER» под
+   словом остаётся чёткой на любом экране. Подробнее — в build.py. */
+.bdg-cobrand{
+  display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;
+  margin-bottom:var(--s4);
+}
+/* Логотип встаёт ровно в ширину слова «Welcome» из заголовка под ним.
+   Так просил клиент, и так же сделано у MasterFFL.
+
+   Ширина слова привязана к кеглю заголовка жёстко: замер на восьми ширинах
+   от 360 до 1440 дал 4,382 кегля с разбросом 0,01% — логотип и заголовок
+   живут в одной шкале, отношение не плавает. Поэтому размер задаётся
+   формулой от --t-h1, а не порогами: он едет за заголовком сам, включая
+   мобильную шкалу внутри медиа-запроса.
+
+   Считаем слово БЕЗ запятой. Запятая — висячий знак, по ней не равняются,
+   и с ней множитель был бы 4,678 (на 64px это лишние 19px вправо).
+
+   ⚠️ Множитель снят с конкретного слова. Поменяется ПЕРВОЕ слово заголовка —
+   пересними, иначе логотип разъедется с ним. Остальной текст заголовка
+   можно править свободно, на множитель он не влияет.
+
+   ⚠️ Оптический размер знака у партнёров при этом НЕ общий. Логотип
+   Meprolight составной (блок «M», слово, подпись), пропорция 1,7:1 против
+   3,1:1 у MasterFFL — при равной ширине он заметно крупнее соседа. Это
+   осознанно: клиент просил крупнее, а привязка к слову важнее единообразия
+   между страницами. */
+.bdg-cobrand img{width:calc(var(--t-h1) * 4.382);height:auto;}
+/* Доля колонок ОДНА на все ширины: иллюстрация всегда справа от текста и
+   уменьшается вместе с ним, а не меняет место и не меняет пропорцию.
+   Зазор задан плавной переменной, поэтому тоже сжимается ровно. */
+.bdg-herogrid{display:grid;grid-template-columns:minmax(0,1.44fr) minmax(0,.56fr);gap:var(--s6);align-items:center;}
+.bdg-hero h1{font-size:var(--t-h1);color:#fff;}
+.bdg-rule{width:80px;height:3px;background:var(--brass);margin-top:var(--s4);}
+.bdg-hero .bdg-cta-row{margin-top:var(--s5);}
+/* Hero entrance. Everything is declared visible and only animates from there,
+   so `prefers-reduced-motion` (which kills every animation further down) leaves
+   a correctly rendered hero rather than an empty one. */
+/* Заголовок анимируется ТОЛЬКО цветом.
+   Раньше слова ещё и всплывали снизу (translate3d). На телефоне это давало
+   заметное дрожание: сдвиг текста по вертикали заставляет браузер пересобирать
+   глифы на каждом кадре, и буквы мелко трясутся. Движение убрано целиком —
+   осталось остывание из латуни в белый и тёплая волна по кругу.
+   inline-block тоже снят: он был нужен только под transform. */
+.bdg-hero h1 span{
+  animation:
+    bdg-title-cool 1.5s ease-out both,               /* прилетает латунным, остывает в белый */
+    bdg-title-wave 4.5s ease-in-out infinite;        /* дальше тёплая волна по кругу */
+}
+/* две задержки на слово — по одной на каждую анимацию из списка выше.
+   Волна идёт с шагом 0,22 с против 0,09 с у остывания: так она читается как
+   отдельный проход, а не как повтор появления. */
+.bdg-hero h1 span:nth-child(1){animation-delay:.08s,2.20s;}
+/* the rule draws itself out from under the last word */
+.bdg-rule{transform-origin:left center;animation:bdg-draw .5s cubic-bezier(.2,.75,.25,1) .56s both;}
+.bdg-hero .bdg-cta-row{animation:bdg-rise .8s cubic-bezier(.2,.75,.25,1) .86s both;}
+@keyframes bdg-rise{
+  from{opacity:0;transform:translate3d(0,.42em,0);}
+  to  {opacity:1;transform:none;}
+}
+@keyframes bdg-draw{
+  from{transform:scaleX(0);}
+  to  {transform:scaleX(1);}
+}
+/* Цвет заголовка. Базовый #fff задан на самом h1, поэтому при выключенной
+   анимации слова просто белые — обе анимации ниже только уводят цвет оттуда. */
+@keyframes bdg-title-cool{
+  0%,45%{color:var(--brass-lit);text-shadow:0 0 34px rgba(227,178,95,.40);}
+  100%  {color:#fff;text-shadow:none;}
+}
+@keyframes bdg-title-wave{
+  0%,100%{color:#fff;text-shadow:none;}
+  45%    {color:var(--brass-lit);text-shadow:0 0 30px rgba(227,178,95,.32);}
+}
+
+/* Hero artwork. The base transform is declared outside the animations so the
+   suppressor still sits at its intended angle when motion is switched off. */
+/* У файла ~16% пустых полей с каждой стороны, поэтому при `contain` рисунок
+   занимает лишь две трети бокса. На широком экране это воздух, на узком —
+   картинка теряется, и её масштаб приходится задавать отдельно. Размер живёт
+   в переменной: его читают фон, маска и маска блика, и разойтись им нельзя. */
+/* 132% и на десктопе тоже: у файла около 16% пустых полей с каждой стороны,
+   при contain рисунок занимал бы две трети бокса. Значение одно на все
+   ширины — иначе размер рисунка скакал бы на границе медиа-запроса. */
+/* Рисунок центрируется ПО ТЕКСТУ, а не тянет ряд сетки вниз. Раньше фигура
+   была квадратной (высота = ширине колонки) и на широком экране свисала на
+   ~110px ниже кнопок — правая половина шапки проседала.
+   Приём: у фигуры высота 0, поэтому высоту ряда задаёт только текстовая
+   колонка, а align-items:center ставит её нулевую линию ровно в середину
+   текста. Рисунок абсолютным позиционированием раскладывается от этой линии
+   в обе стороны: margin-top в процентах считается от ШИРИНЫ контейнера, а она
+   у квадратного рисунка равна его высоте, поэтому -50% — это ровно половина
+   рисунка. Числовых подгонок под ширину экрана здесь нет: правило одно на все
+   ширины, композиция не меняется при уменьшении окна.
+   ⚠️ Ширина рисунка задаётся здесь, а не через inset: она же участвует в
+   расчёте margin-top, и разъехаться им нельзя. */
+.bdg-heroart{position:relative;height:0;--art-fit:132%;}
+.bdg-heroart .bdg-art{
+  position:absolute;left:0;top:50%;width:100%;margin-top:-50%;
+  display:block;aspect-ratio:1/1;
+  background:var(--art) center/var(--art-fit) no-repeat;
+  transform:rotate(-8deg);
+  animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+            bdg-art-drift 4.5s ease-in-out 1.1s infinite;
+}
+/* Colour flowing through the artwork.
+
+   The cut-out has a FLAT brass RGB — the whole drawing lives in its alpha
+   channel (see tools-cutout.py). So the file works as a mask: put a slowly
+   moving brass gradient underneath and the colour travels along the drawn
+   lines themselves, instead of the flat fill the plain <img> gives.
+
+   Kept behind @supports because the failure mode matters: without masking
+   this rule would paint a solid brass rectangle, so browsers that cannot
+   mask keep the flat artwork above and simply do not shimmer. */
+@supports ((-webkit-mask-image:url("a.webp")) or (mask-image:url("a.webp"))){
+  .bdg-heroart .bdg-art{
+    -webkit-mask:var(--art) center/var(--art-fit) no-repeat;
+            mask:var(--art) center/var(--art-fit) no-repeat;
+    /* tones stay inside the brand's brass, from deep bronze to lit gold —
+       the mid stop is the artwork's own colour, so the average reads unchanged */
+    background:linear-gradient(118deg,
+      #6B4A24  0%, #B07C33 16%, #E2BB66 32%, #F7E6B6 44%,
+      #C0933F 60%, #8E5F27 78%, #6B4A24 100%);
+    /* deliberately close to the element's own size: a much larger gradient
+       would cover the drawing with one near-flat slice and merely pulse the
+       whole thing. At this size several tones sit on the object at once, so
+       the colour actually travels along it. */
+    background-size:135% 135%;
+    animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+              bdg-art-drift 4.5s ease-in-out 1.1s infinite,
+              bdg-art-flow 5s ease-in-out 1.1s infinite alternate;
+  }
+}
+/* A highlight swept across a copy of the artwork, masked by the artwork's own
+   alpha, so the light travels along the drawn lines instead of over a box. */
+.bdg-heroart::after{
+  content:"";position:absolute;left:0;top:50%;width:100%;margin-top:-50%;
+  aspect-ratio:1/1;pointer-events:none;
+  transform:rotate(-8deg);
+  -webkit-mask:var(--art) center/var(--art-fit) no-repeat;
+          mask:var(--art) center/var(--art-fit) no-repeat;
+  background:linear-gradient(100deg,
+    transparent 30%, rgba(244,214,160,.9) 50%, transparent 70%);
+  background-size:200% 100%;background-position:140% 0;
+  mix-blend-mode:screen;
+  animation:bdg-art-in 1.1s cubic-bezier(.2,.7,.2,1) both,
+            bdg-art-drift 4.5s ease-in-out 1.1s infinite,
+            bdg-sheen 8.5s ease-in-out 1.9s infinite;
+}
+@keyframes bdg-art-in{
+  from{opacity:0;transform:rotate(-15deg) translate3d(0,28px,0) scale(.93);}
+  to  {opacity:1;transform:rotate(-8deg) translate3d(0,0,0) scale(1);}
+}
+@keyframes bdg-art-flow{
+  from{background-position:0% 50%;}
+  to  {background-position:100% 50%;}
+}
+@keyframes bdg-art-drift{
+  0%,100%{transform:rotate(-8deg) translate3d(0,0,0);}
+  50%    {transform:rotate(-6.8deg) translate3d(0,-13px,0);}
+}
+/* the gradient parks off-frame at both ends, so the loop's jump is never seen */
+@keyframes bdg-sheen{
+  0%,45%  {background-position:140% 0;}
+  95%,100%{background-position:-40% 0;}
+}
+
+/* ---------- 2. Rebate at a glance ---------------------------------------- */
+
+/* ---------- 3. How to Redeem --------------------------------------------- */
+.bdg-steps{background:var(--recess);}
+
+/* Шаги — живым текстом, а не картинкой. Инфографика несла те же сведения
+   растром: на телефоне её мелкий шрифт не читался, в поиск и скринридер она
+   попадала только через alt, и весила 89 КБ после base64.
+   Сама инфографика осталась, но четыре карточки с шагами из неё стёрты
+   (tools-cutout.py): дублировать шаги растром незачем.
+
+   Картинка лежит на собственном чёрном фоне. Вырезать его нельзя — это фото
+   тёмного объекта, порог съел бы половину. Поэтому фон гасится блендингом:
+   screen против строго чёрного возвращает подложку нетронутой, а чёрная точка
+   у файла опущена заранее, иначе остался бы светлый прямоугольник.
+   Цена приёма: никаких transform на родителях. */
+figure.bdg-poster{position:relative;}
+/* Шаги живут внутри растра, поэтому ссылки из них нельзя сделать разметкой.
+   Поверх картинки ложатся прозрачные <a>: подчёркивание нарисовано в самой
+   картинке, а рамки клика build.py берёт из assets/link-map.json, который
+   пишет poster_layout.py. Рамки в долях, а не в пикселях, — картинка тянется
+   по ширине окна, и в пикселях они бы разъехались. */
+.bdg-hot{position:absolute;display:block;border-radius:3px;}
+.bdg-hot:hover{background:rgba(226,178,95,.16);}
+.bdg-hot:focus-visible{outline:2px solid var(--brass-lit);outline-offset:2px;}
+
+.bdg-poster img{display:block;width:100%;height:auto;max-width:100%;mix-blend-mode:screen;}
+
+/* ---------- Ролик «как это работает» ---------------------------------------
+   Видео-инструкция без видео: четыре шага сменяют друг друга сами, по 2 с,
+   круг 8 с. Настоящий файл сюда не положить — страница вставляется в
+   BigCommerce одним куском, а даже короткий клип весит больше всей страницы.
+   Здесь же вся анимация — CSS, а картинки те же, что уже есть в проекте.
+
+   Свёрстано «статикой вперёд»: по умолчанию это обычный список из четырёх
+   шагов, и только при prefers-reduced-motion:no-preference он превращается
+   в плеер. Поэтому при выключенной анимации остаётся читаемый список,
+   а не стопка наложенных друг на друга слайдов. */
+
+.bdg-ast{color:var(--brass-lit);font-weight:800;}
+
+.bdg-ready{
+  margin-top:var(--s5);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s4);
+}
+.bdg-ready h3{font-size:var(--t-card);color:#fff;}
+.bdg-ready p{margin-top:var(--s1);color:var(--muted);font-size:var(--t-body);max-width:48ch;}
+
+/* ---------- 4. Please note ------------------------------------------------ */
+/* «Please note» стоит сразу под инфографикой — сноска к звёздочке на ней */
+.bdg-notecard{margin-top:var(--s4);}
+.bdg-notecard h2{font-size:var(--t-card);color:#fff;}
+.bdg-notecard h2 .bdg-ast{margin-right:4px;}
+.bdg-notecard p{color:var(--muted);font-size:var(--t-body);margin-top:var(--s2);max-width:76ch;}
+
+/* ---------- 5. Terms and Conditions --------------------------------------- */
+.bdg-legal{background:var(--recess);border-top:1px solid var(--line);}
+.bdg-legal .bdg-wrap{max-width:880px;}
+/* Заголовок секции единственный, поэтому он крупнее прежнего служебного
+   ярлыка, но мельче заголовков остальных секций: это юридический текст,
+   он не должен спорить за внимание с офером. */
+.bdg-legal h2{
+  font-size:clamp(24px,2.4vw,30px);font-weight:800;letter-spacing:-.02em;
+  color:#fff;line-height:1.2;
+}
+/* Три сплошных абзаца юридического текста читаются тяжело, поэтому каждый
+   получил латунный надзаголовок — тот же приём, что у всех секций страницы,
+   и волоски-разделители, как в списке шагов. Слова самих условий не тронуты:
+   надзаголовки — навигация, а не часть текста, и снимаются без последствий. */
+.bdg-terms{margin-top:var(--s5);display:grid;}
+.bdg-terms article{padding:var(--s5) 0;border-top:1px solid var(--line-soft);}
+.bdg-terms article:last-child{border-bottom:1px solid var(--line-soft);}
+.bdg-terms h3{
+  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--brass-lit);
+}
+/* первая фраза — операционная: ей клиент даёт согласие, поэтому она светлее */
+.bdg-terms b{color:var(--text);font-weight:600;}
+/* Колонка 880px даёт около 100 знаков в строке — для длинных абзацев это
+   много, глаз теряет начало следующей строки. Ограничиваем меру примерно
+   до 72 знаков. Значение в ch подобрано замером, а не на глаз: единица ch
+   равна ширине цифры, а она заметно шире средней строчной буквы, поэтому
+   74ch давали не 74 знака, а 90. */
+.bdg-legal p{
+  font-size:var(--t-legal);line-height:1.75;color:var(--muted);
+  margin-top:var(--s2);max-width:59ch;
+}
+
+/* ---------- 6. Close ------------------------------------------------------ */
+.bdg-close{
+  background:linear-gradient(180deg,rgba(255,255,255,.04) 0%,rgba(178,123,41,.11) 100%);
+  border-top:1px solid var(--line);text-align:center;
+}
+.bdg-close p{
+  font-size:clamp(23px,2.9vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.25;
+  color:#fff;max-width:28ch;margin:0 auto;text-wrap:balance;
+}
+.bdg-close .bdg-cta-row{justify-content:center;margin-top:var(--s5);}
+
+/* ---------- Responsive ----------------------------------------------------
+   Breakpoints follow the content, not device names: each one fires where a
+   particular block actually stops fitting.
+   1180 hero columns tighten · 1024 four-up grids drop to two · 900 hero stacks
+   860 poster type gets too small to read · 620 everything goes single column
+   380 type and padding step down for the narrowest phones
+   -------------------------------------------------------------------------- */
+@media (max-width:900px){
+  .bdg{--pad-card:24px;}
+}
+@media (max-width:620px){
+  /* поворот на -8deg делает бокс шире самой картинки в 1.13 раза,
+     поэтому на узких экранах ограничиваем её отдельно от десктопных 300px */
+
+  /* Предел ширины у абзацев снят: 59ch держали колонку условий в две трети
+     экрана. Кегль здесь не переопределяется — шкала ниже плавная и сама
+     уменьшается вместе с окном. */
+  .bdg-legal p{max-width:none;}
+  .bdg-ready p,.bdg-notecard p{max-width:none;}
+  .bdg-wrap{padding:0 var(--s3);}
+  .bdg-ready{gap:var(--s3);}
+
+  /* Шапка на телефоне держит десктопную композицию — текст слева,
+     иллюстрация справа, кнопки в ряд, — но кегль здесь не упирается в
+     десктопные полы шкалы. С ними h1 в колонке шириной 182px занимал пять
+     строк, кнопки уезжали в столбик, и первый экран уходил в скролл целиком.
+     Верхние границы всех клампов ниже совпадают с десктопными значениями на
+     620px, поэтому на границе медиа-запроса ничего не прыгает. */
+  .bdg{--t-h1:clamp(22px,4.35vw + 9px,36px);}
+  .bdg-hero{padding:var(--s5) 0 var(--s6);}
+  .bdg-cobrand{margin-bottom:var(--s4);}
+  /* Колонки на телефоне уже не 1.12/.88: в узкой колонке кнопки ломались на
+     четыре строки. Рисунку хватает четверти ширины — он и на макете занимает
+     примерно столько. */
+  .bdg-herogrid{grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr);gap:var(--s3);}
+  .bdg-hero h1{line-height:1.12;}
+  .bdg-rule{width:56px;height:2px;margin-top:var(--s3);}
+  /* Ряд ниже перебивает правило @media 900: там кнопки складываются в столбик
+     именно из-за крупного кегля, а на этой шкале обе надписи снова встают
+     рядом. Правило адресовано только шапке — нижний блок остаётся столбиком. */
+  .bdg-hero .bdg-cta-row{grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin-top:var(--s4);}
+  .bdg-hero .bdg-btn{font-size:clamp(11px,1.3vw + 6.4px,16px);padding:var(--s2);}
+}
+@media (max-width:900px){
+  /* Шапка остаётся в две колонки на всех ширинах, поэтому колонка с текстом
+     здесь уже узкая: два ряда кнопок в ней ломают надписи на три строки.
+     Разворачиваем ряд в столбик — ширина у кнопок остаётся общей. */
+  .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
+}
+@media (max-width:380px){
+  .bdg{--pad-card:20px;}
+}
+@media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
+</style>
+
+<!-- 1. Welcome -->
+<section class="bdg-hero">
+  <div class="bdg-wrap">
+    <div class="bdg-cobrand">
+      <img src="assets/meprolight-logo.svg" width="213" height="126" alt="Meprolight Optics">
+    </div>
+    <div class="bdg-herogrid">
+      <div>
+        <h1><span>Welcome, Meprolight customers!</span></h1>
+        <div class="bdg-rule"></div>
+        <div class="bdg-cta-row">
+          <a class="bdg-btn bdg-btn--solid" href="#how-to-redeem">How to Redeem Your Rebate</a>
+          <a class="bdg-btn bdg-btn--ghost" href="https://backdraftsuppressors.com/suppressors/">Shop Suppressors</a>
+        </div>
+      </div>
+      <figure class="bdg-heroart" role="img" aria-label="Outlier 4&Prime; Hunter suppressor, non-magnum">
+        <span class="bdg-art"></span>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. How to Redeem Your Rebate -->
+<section class="bdg-steps" id="how-to-redeem">
+  <div class="bdg-wrap">
+    <figure class="bdg-poster">
+      <img src="assets/redemption-infographic.webp" width="1300" height="1136" alt="How to redeem your Free Suppressor Rebate. Use your rebate code at checkout to redeem your 4&Prime; Hunter suppressor: Step 1: Visit BackdraftSuppressors.com. Step 2: Select a 4&Prime; Hunter, or upgrade to 6&Prime;, 8&Prime;, or steel Poacher for an additional cost. Step 3: Select the required HUB Adapter. Step 4: Enter the rebate code at checkout. Step 5: Select your preferred FFL/SOT for suppressor transfer. Step 6: Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes. Want more performance? Upgrade to a 4&Prime; or 6&Prime; or 8&Prime; suppressor for more length, better sound reduction, and even more performance. Go full auto. Go stainless. Upgrade to our stainless steel, full auto rated suppressor options built for the most demanding use. Suppressor transfers follow all applicable ATF/NFA requirements. Shipping, transfer, tax, and required adapter costs apply." loading="lazy">
+      <!--poster-links-->
+    </figure>
+
+    <div class="bdg-notecard">
+      <h2><span class="bdg-ast">*</span>Please note:</h2>
+      <p>Shipping/Handling, the required HUB Adapter, applicable taxes, transfer taxes, and any FFL/SOT or ATF/NFA-related fees are the responsibility of the customer.</p>
+    </div>
+
+
+    <div class="bdg-ready">
+      <div>
+        <h3>Ready to Redeem?</h3>
+        <p>Choose your 4&Prime; Hunter Suppressor, add the required HUB Adapter, and enter your rebate code at checkout.</p>
+      </div>
+      <a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem Your Suppressor Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Terms and Conditions -->
+<section class="bdg-legal" id="rebate-terms">
+  <div class="bdg-wrap">
+    <h2>Terms &amp; Conditions</h2>
+
+    <div class="bdg-terms">
+      <article>
+        <h3>Rebate and codes</h3>
+        <p><b>By redeeming the Free Suppressor Rebate, the customer acknowledges and agrees to these Terms and Conditions.</b> Each valid rebate code may be redeemed toward one eligible 4&Prime; Hunter Suppressor. Where available, the rebate may be applied toward an eligible suppressor upgrade, with the customer responsible for any price difference. The rebate applies to the suppressor only and does not include the required HUB Adapter, shipping or handling, taxes, transfer taxes, ATF/NFA-related fees, FFL/SOT fees, dealer fees, or any other applicable charges. All products, configurations, finishes, calibers, and upgrade options are subject to availability. Rebate codes have no cash value and may not be duplicated, altered, or fraudulently generated. Codes may be transferred or gifted to another eligible person but may not be combined with other discounts or promotions unless expressly authorized.</p>
+      </article>
+
+      <article>
+        <h3>Eligibility and transfer</h3>
+        <p>The customer is responsible for ensuring they are legally eligible to purchase, possess, and receive a suppressor and for complying with all applicable federal, state, and local laws. Suppressors must be transferred through a qualified FFL/SOT, and the customer is responsible for selecting the FFL/SOT and paying all associated transfer, processing, storage, tax, and other third-party fees. A compatible HUB Adapter is required and must be purchased separately; the customer is responsible for confirming compatibility with their firearm and intended setup. This promotion is available only where suppressors are legal and is void where prohibited or restricted by law. Redemption of a rebate code does not guarantee eligibility or completion of a transfer. In the event of a returned or cancelled qualifying purchase, chargeback, fraudulent or unauthorized use, ineligibility, or violation of these terms, Backdraft Suppressors reserves the right to void or cancel the rebate, redemption, or order and recover the promotional value where applicable.</p>
+      </article>
+
+      <article>
+        <h3>Cancellations and program changes</h3>
+        <p>Due to the regulated nature of suppressors, orders may not be eligible for cancellation, return, exchange, or refund after shipment, transfer, or required paperwork has begun, except where required by law. Backdraft Suppressors reserves the right to modify, suspend, extend, or terminate this promotion, change eligible products or requirements, substitute products of equal or greater value when necessary, or deny or revoke any redemption involving misuse, fraud, error, ineligibility, or violation of these Terms and Conditions. All redemptions are subject to product availability and applicable law.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Close -->
+<section class="bdg-close">
+  <div class="bdg-wrap">
+    <p>We appreciate your support!</p>
+    <div class="bdg-cta-row">
+      <a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem Your Rebate</a>
+      <a class="bdg-btn bdg-btn--ghost" href="https://backdraftsuppressors.com/">Visit the Website</a>
+    </div>
+  </div>
+</section>
+
+
+</div>
