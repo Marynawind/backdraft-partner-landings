@@ -392,9 +392,15 @@ figure.bdg-poster{position:relative;}
      уменьшается вместе с окном. */
   .bdg-legal p{max-width:none;}
   .bdg-lede,.bdg-eligible,.bdg-ready p,.bdg-notecard p{max-width:none;}
-  /* Иллюстрация держала 38% ширины, и на кнопки в шапке оставалось 206 px —
-     надпись ломалась на две строки. Долю урезаем, картинка просто мельче. */
-  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.42fr);}
+  /* На телефоне две колонки не работают: иллюстрация держала 38% ширины,
+     заголовок ломался на четыре строки, у абзацев оставалась пустота справа,
+     кнопки выходили короче полосы. Урезать её долю тоже нельзя — картинка
+     превращается в точку. Поэтому на узком экране шапка становится одной
+     колонкой, а иллюстрация уходит ПОД кнопки отдельным блоком и там снова
+     нормального размера. Именно под, а не над: наверх она когда-то прыгала,
+     и клиент просил так не делать. */
+  .bdg-herogrid{grid-template-columns:minmax(0,1fr);}
+  .bdg-heroart{margin:var(--s5) auto 0;max-width:min(280px,66vw);}
   .bdg-cobrand{margin-bottom:var(--s5);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
@@ -408,10 +414,9 @@ figure.bdg-poster{position:relative;}
 @media (max-width:380px){
   .bdg{--pad-card:20px;}
   /* «Gun Owners» склеено неразрывным пробелом и не переносится, поэтому
-     на самом узком экране кегль и доля колонки под картинку идут вниз —
-     иначе слово вылезает за свою колонку */
+     на самом узком экране кегль идёт вниз — иначе слово вылезает за колонку */
   .bdg-hero h1{font-size:28px;}
-  .bdg-herogrid{grid-template-columns:minmax(0,1fr) minmax(0,.34fr);gap:var(--s3);}
+  .bdg-herogrid{gap:var(--s3);}
 }
 @media (prefers-reduced-motion:reduce){.bdg *{transition:none !important;animation:none !important;}}
 </style>
