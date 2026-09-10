@@ -7,17 +7,17 @@
 ## 1. Welcome (hero)
 **Наверху:** логотип Master FFL, светлая версия (без подписи рядом)
 
-**H1:** Welcome, MasterFFL Members!
+**H1:** Welcome!
 
-Thank you for using MasterFFL!
-
-Утверждено клиентом 10.09.2026. У GOA на этом месте стояла длинная фраза
-про поддержку организации и Вторую поправку — к сервису комплаенса она
-не подходила, клиент дал короткую замену.
-
-As a MasterFFL member, you're eligible to redeem your **Free Suppressor Rebate**.
+Start your **Free Suppressor Redemption** here.
 
 **CTA:** How to Redeem Your Rebate · Shop Suppressors
+
+Утверждено клиентом 10.09.2026. Шапка прошла две правки за день: сначала
+третья строка GOA (длинная фраза про поддержку организации и Вторую
+поправку) была заменена на «Thank you for using MasterFFL!», затем клиент
+свернул все три строки в эти две. Варианта «Thank you for using MasterFFL!»
+на странице больше нет.
 
 ## 2. Rebate at a glance — блок удалён
 
@@ -115,7 +115,7 @@ As a MasterFFL member, you're eligible to redeem your **Free Suppressor Rebate**
 Список: HUB Adapter · Shipping and handling · Applicable taxes · Transfer taxes · ATF/NFA-related fees · FFL/SOT transfer fees
 
 ## 5. Close
-We appreciate your support and are proud to offer this exclusive benefit to fellow Second Amendment supporters.
+We appreciate your support!
 
 **CTA:** Redeem Your Rebate → `backdraftsuppressors.com/backdraft-hunter/` ·
 Visit the Website → `backdraftsuppressors.com`
