@@ -17,6 +17,26 @@
 </style>
 </head>
 <body>
-<iframe src="bigcommerce-page.html" title="Meprolight Optics Rebate"></iframe>
+<!-- Ссылки уводим в ВЕРХНЕЕ окно, а не в рамку.
+
+     Магазин отдаёт `x-frame-options: deny` — показывать себя внутри рамки он
+     запрещает. Клик по кнопке уводил бы рамку на backdraftsuppressors.com,
+     браузер отказывался бы его рисовать, и снаружи это выглядит как «кнопка
+     не работает». В самом магазине рамки нет и проблемы нет — она живёт
+     только в превью, поэтому и лечится здесь, а не в боевом файле.
+
+     Якоря внутри страницы (#how-to-redeem) не трогаем: с target=_top они
+     вытащили бы голый фрагмент в верхнее окно, то есть ровно ту вёрстку
+     на 980px, ради которой рамка и заведена. -->
+<iframe id="page" src="bigcommerce-page.html" title="Meprolight Optics Rebate"></iframe>
+<script>
+  document.getElementById('page').addEventListener('load', function () {
+    var d = this.contentDocument;
+    if (!d) return;                       // чужой источник — молча выходим
+    d.querySelectorAll('a[href]').forEach(function (a) {
+      if (a.getAttribute('href').charAt(0) !== '#') a.target = '_top';
+    });
+  });
+</script>
 </body>
 </html>
