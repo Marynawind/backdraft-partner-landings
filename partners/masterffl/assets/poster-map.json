@@ -1,0 +1,33 @@
+{
+  "head": {
+    "w": 1536,
+    "h": 420,
+    "right": 1180
+  },
+  "steps": [
+    "Visit BackdraftSuppressors.com",
+    "Select a 4\" Hunter, or upgrade to 6\", 8\", or steel Poacher for an additional cost.",
+    "Select the required HUB Adapter.",
+    "Enter the rebate code at checkout.",
+    "Select your preferred FFL/SOT for suppressor transfer.",
+    "Complete checkout and pay all required charges, including any upgrade cost, HUB Adapter, shipping, and taxes."
+  ],
+  "links": [
+    {
+      "href": "https://backdraftsuppressors.com/",
+      "label": "BackdraftSuppressors.com",
+      "left": 15.972,
+      "top": 39.046,
+      "width": 34.071,
+      "height": 3.651
+    },
+    {
+      "href": "https://backdraftsuppressors.com/backdraft-hunter/",
+      "label": "4\" Hunter",
+      "left": 20.269,
+      "top": 44.56,
+      "width": 11.871,
+      "height": 3.651
+    }
+  ]
+}

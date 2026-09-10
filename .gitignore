@@ -4,7 +4,7 @@
 # Собирается из page.src.html скриптом build.py, нужен только локально.
 # bigcommerce-page.html при этом версионируем: это тот файл, который
 # вставляют в магазин, и он должен быть доступен без запуска сборки.
-partners/goa/preview.html
+partners/*/preview.html
 
 # Скриншоты клиента, прилетающие в корень: рабочие копии лежат под ASCII-именами
 # в partners/goa/reference/, а исходники сборки — в assets/source/.
