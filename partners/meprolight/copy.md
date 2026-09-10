@@ -7,7 +7,11 @@
 ## 1. Welcome (hero)
 **Наверху:** логотип Meprolight, белая версия (без подписи рядом)
 
-**H1:** Welcome, Meprolight customers!
+**H1:** Welcome,<br>Meprolight customers!
+
+Перенос после «Welcome,» задан **жёстко** (`<br>`), а не отдан переносу по
+ширине: две строки нужны на любом экране. Так же сделано у [Guns.com](../guns/copy.md).
+На узких экранах вторая строка при необходимости переносится дальше сама.
 
 **CTA:** How to Redeem Your Rebate · Shop Suppressors
 
