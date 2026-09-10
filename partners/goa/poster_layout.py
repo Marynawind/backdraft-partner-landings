@@ -46,10 +46,10 @@ INK = (199, 199, 199)
 # не шире 1112 CSS px при исходнике 1536, то есть уменьшается в 0,72 раза.
 # Прописная 26 px даёт на экране 19 px — крупнее основного текста страницы:
 # шаги здесь главное содержимое картинки, а не подпись к ней.
-STEP_CAP, STEP_LEAD, STEP_GAP = 26, 40, 15   # высота прописной, интерлиньяж, поля пункта
-NUM_CAP = 28
-STRIP_CAP, STRIP_LEAD = 15, 22               # полоса — сноска, поэтому мельче шагов
-ICON_H = 50
+STEP_CAP, STEP_LEAD, STEP_GAP = 30, 46, 17   # высота прописной, интерлиньяж, поля пункта
+NUM_CAP = 32
+STRIP_CAP, STRIP_LEAD = 17, 25               # полоса — сноска, поэтому мельче шагов
+ICON_H = 56
 RADIUS = 11                                  # радиус рамки, снят с прежней плашки сноски
 BOTTOM = 24                                  # поле от рамки до низа картинки
 
@@ -125,7 +125,7 @@ RENDER_BOTTOM = 1005               # низ тени рендера в исхо�
 # чисто (заголовок кончается на 405, декоративная линейка начинается с 485).
 SUBTITLE = 'Use your rebate code at checkout to redeem your 4" Hunter suppressor:'
 SUB_BOX = (80, 425, 1160, 470)     # что стереть
-SUB_X, SUB_BASE, SUB_CAP = 89, 454, 22
+SUB_X, SUB_BASE, SUB_CAP = 89, 454, 24
 
 
 def sized(path: pathlib.Path, cap: int) -> ImageFont.FreeTypeFont:
