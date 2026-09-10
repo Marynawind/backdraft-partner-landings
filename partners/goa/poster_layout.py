@@ -83,7 +83,6 @@ COLUMNS = [
 LINKS = {
     1: ("BackdraftSuppressors.com", "https://backdraftsuppressors.com/"),
     2: ('4" Hunter', "https://backdraftsuppressors.com/backdraft-hunter/"),
-    3: ("HUB Adapter", "https://backdraftsuppressors.com/adapters/"),
 }
 POSTER_MAP = HERE / "assets" / "poster-map.json"
 # Низ шапки для обрезки на узком экране: логотип и заголовок. Подпись под ним
