@@ -325,12 +325,22 @@
 
 .bdg-form{
   margin-top:var(--s6);
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s3);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--s3);
   border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:var(--radius);
   background:var(--lift);padding:var(--pad-card);
 }
 .bdg-field{display:flex;flex-direction:column;gap:var(--s1);min-width:0;}
-.bdg-field--wide{grid-column:1 / -1;}
+/* Серийник и чек вынесены в общий блок с разделителем «or» между ними: иначе
+   из подписей не видно, что достаточно одного. Блок уже формы намеренно —
+   так пара читается как одно целое, а поле серийного номера не растягивается
+   на всю ширину страницы. */
+.bdg-either{grid-column:1 / -1;display:grid;gap:var(--s3);max-width:560px;}
+.bdg-or{
+  display:flex;align-items:center;gap:var(--s3);
+  font-size:var(--t-label);font-weight:800;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--brass-lit);
+}
+.bdg-or::before,.bdg-or::after{content:"";flex:1;height:1px;background:var(--line-soft);}
 .bdg-field label{
   font-family:var(--f);font-size:var(--t-label);font-weight:800;
   letter-spacing:.14em;text-transform:uppercase;color:var(--brass-lit);
@@ -367,23 +377,23 @@
    оставлено — чтобы правка одного атрибута не сломала форму.
 
    ⚠️ Вторая цена приёма: имя выбранного файла показывать нечем — его рисовало
-   родное поле, а без JS взять его неоткуда. */
-.bdg-file{position:relative;display:inline-block;align-self:start;}
-.bdg-file-input{
-  position:absolute;inset:0;width:100%;height:100%;
-  opacity:0;cursor:pointer;
+   родное поле, а без JS взять его неоткуда.
+ Коробка повторяет текстовое поле ровно: те же отступы, кегль и интерлиньяж,
+   поэтому высота совпадает сама, без подогнанных чисел. Надпись внутри —
+   латунная: латунь на этой странице означает «сюда можно нажать». */
+.bdg-file{
+  position:relative;display:block;width:100%;cursor:pointer;
+  font-size:var(--t-body);line-height:1.5;font-weight:700;color:var(--brass-lit);
+  padding:var(--s2) var(--s3);
+  background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:var(--radius);
+  transition:border-color .18s ease;
 }
-.bdg-file-btn{
-  display:inline-block;pointer-events:none;
-  font-size:var(--t-label);font-weight:700;color:var(--text);
-  padding:var(--s2) var(--s4);
-  border:1px solid var(--line);border-radius:var(--radius);
-  transition:border-color .18s ease,color .18s ease;
-}
-.bdg-file:hover .bdg-file-btn{border-color:var(--brass);color:var(--brass-lit);}
-/* Рамка фокуса — на надписи, потому что само поле прозрачное. :has читают все
+.bdg-file:hover{border-color:var(--brass);}
+.bdg-file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
+.bdg-file-btn{pointer-events:none;}
+/* Рамка фокуса — на коробке, потому что само поле прозрачное. :has читают все
    нынешние браузеры; где не прочтут, фокус просто не подсветится. */
-.bdg-file:has(.bdg-file-input:focus-visible) .bdg-file-btn{
+.bdg-file:has(.bdg-file-input:focus-visible){
   outline:2px solid var(--brass-lit);outline-offset:2px;border-color:var(--brass);
 }
 .bdg-hint{font-size:var(--t-label);color:var(--muted);}
@@ -519,9 +529,6 @@ figure.bdg-poster{position:relative;}
      уменьшается вместе с окном. */
   .bdg-legal p{max-width:none;}
   .bdg-ready p,.bdg-notecard p{max-width:none;}
-  /* Форма в один столбец: в половине узкой колонки поля по 130px, в них не
-     видно ни телефона, ни имени файла. */
-  .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
 
@@ -551,6 +558,9 @@ figure.bdg-poster{position:relative;}
      здесь уже узкая: два ряда кнопок в ней ломают надписи на три строки.
      Разворачиваем ряд в столбик — ширина у кнопок остаётся общей. */
   .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
+  /* Форма в один столбец: три поля в ряд тут дают колонки по 170px, в которых
+     не помещается ни почта, ни телефон. */
+  .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
 }
 @media (max-width:380px){
   .bdg{--pad-card:20px;}
@@ -605,18 +615,22 @@ figure.bdg-poster{position:relative;}
         <input id="bdg-phone" name="phone" type="tel" autocomplete="tel" required>
       </div>
 
-      <div class="bdg-field">
-        <label for="bdg-serial">Serial number</label>
-        <input id="bdg-serial" name="serial" type="text" autocomplete="off">
-      </div>
+      <div class="bdg-either">
+        <div class="bdg-field">
+          <label for="bdg-serial">Serial number</label>
+          <input id="bdg-serial" name="serial" type="text" autocomplete="off">
+        </div>
 
-      <div class="bdg-field bdg-field--wide">
-        <label for="bdg-proof">Or proof of purchase</label>
-        <span class="bdg-file">
-          <input class="bdg-file-input" id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf">
-          <span class="bdg-file-btn" aria-hidden="true">Choose file</span>
-        </span>
-        <p class="bdg-hint">A photo, screenshot or PDF of your receipt &mdash; JPG, PNG or PDF.</p>
+        <div class="bdg-or" aria-hidden="true">or</div>
+
+        <div class="bdg-field">
+          <label for="bdg-proof">Proof of purchase</label>
+          <span class="bdg-file">
+            <input class="bdg-file-input" id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf">
+            <span class="bdg-file-btn" aria-hidden="true">Choose file</span>
+          </span>
+          <p class="bdg-hint">A photo, screenshot or PDF of your receipt &mdash; JPG, PNG or PDF.</p>
+        </div>
       </div>
 
       <div class="bdg-trap" aria-hidden="true">
