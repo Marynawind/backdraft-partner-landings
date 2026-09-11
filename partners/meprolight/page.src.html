@@ -322,7 +322,6 @@
    всё задано явно — шрифт, кегль, цвет, фон, рамка, — а не унаследовано. */
 .bdg-claim{position:relative;background:var(--recess);border-bottom:1px solid var(--line);}
 .bdg-claim h2{font-size:clamp(24px,2.4vw,30px);color:#fff;}
-.bdg-claim-lead{margin-top:var(--s2);color:var(--muted);font-size:var(--t-body);max-width:56ch;}
 
 .bdg-form{
   margin-top:var(--s6);
@@ -364,7 +363,9 @@
 }
 .bdg-form input[type="file"]::file-selector-button:hover{border-color:var(--brass);color:var(--brass-lit);}
 .bdg-hint{font-size:var(--t-label);color:var(--muted);}
-.bdg-form button.bdg-btn{cursor:pointer;width:100%;}
+/* Кнопка обычной ширины, как остальные на странице: в сетке .bdg-form-foot
+   она иначе растянулась бы на всю строку. */
+.bdg-form button.bdg-btn{cursor:pointer;justify-self:start;}
 .bdg-form-foot{grid-column:1 / -1;display:grid;gap:var(--s3);align-items:center;}
 .bdg-form-foot p{font-size:var(--t-label);color:var(--muted);max-width:60ch;}
 /* Ловушка для ботов: живое поле, которое видит только робот. Скрыто уводом
@@ -493,7 +494,7 @@ figure.bdg-poster{position:relative;}
   /* Форма в один столбец: в половине узкой колонки поля по 130px, в них не
      видно ни телефона, ни имени файла. */
   .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
-  .bdg-claim-lead,.bdg-form-foot p{max-width:none;}
+  .bdg-form-foot p{max-width:none;}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
 
@@ -557,8 +558,7 @@ figure.bdg-poster{position:relative;}
      на настоящий обработчик, форма ничего не отправляет. См. DEPLOY.md. -->
 <section class="bdg-claim" id="claim">
   <div class="bdg-wrap">
-    <h2>Claim Your Rebate</h2>
-    <p class="bdg-claim-lead">Tell us about your Meprolight purchase and we&rsquo;ll e-mail your rebate code.</p>
+    <h2>Fill out the form to get your code</h2>
 
     <form class="bdg-form" method="post" enctype="multipart/form-data" action="REPLACE-WITH-FORM-ENDPOINT">
       <input type="hidden" name="partner" value="Meprolight Optics">
@@ -596,7 +596,7 @@ figure.bdg-poster{position:relative;}
 
       <div class="bdg-form-foot">
         <p>Please give us either a serial number or a proof of purchase &mdash; both is even better. Fields marked <span class="bdg-req">*</span> are required. We use your details only to verify your purchase and send your rebate code.</p>
-        <button class="bdg-btn bdg-btn--solid" type="submit">Send My Details</button>
+        <button class="bdg-btn bdg-btn--solid" type="submit">Submit</button>
       </div>
     </form>
   </div>

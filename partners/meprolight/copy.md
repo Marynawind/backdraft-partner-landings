@@ -41,8 +41,12 @@ Suppressors». Если клиент захочет вернуть строку 
 
 ## 2. Claim Your Rebate (форма)
 
-**H2:** Claim Your Rebate
-**Подзаголовок:** Tell us about your Meprolight purchase and we’ll e-mail your rebate code.
+**H2:** Fill out the form to get your code
+
+Первый вариант был в две строки — заголовок «Claim Your Rebate» и пояснение
+«Tell us about your Meprolight purchase and we’ll e-mail your rebate code».
+Клиент свёл их в одну: сказано ровно то, что человеку нужно сделать и зачем,
+пояснение было лишним. Тот же ход, что и в шапке, где две строки стали одной.
 
 **Подписи полей:** Full name\* · Email\* · Phone\* · Meprolight serial number ·
 Proof of purchase
@@ -50,7 +54,7 @@ Proof of purchase
 **Текст под формой:** Please give us either a serial number or a proof of purchase —
 both is even better. Fields marked \* are required. We use your details only to
 verify your purchase and send your rebate code.
-**Кнопка:** Send My Details
+**Кнопка:** Submit
 
 Партнёр попросил: «a way for Mepro customer to enter their name, phone number,
 email, serial number or upload a proof of purchase». «Или» относится к паре
