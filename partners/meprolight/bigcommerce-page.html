@@ -363,11 +363,15 @@
 }
 .bdg-form input[type="file"]::file-selector-button:hover{border-color:var(--brass);color:var(--brass-lit);}
 .bdg-hint{font-size:var(--t-label);color:var(--muted);}
-/* Кнопка обычной ширины, как остальные на странице: в сетке .bdg-form-foot
-   она иначе растянулась бы на всю строку. */
-.bdg-form button.bdg-btn{cursor:pointer;justify-self:start;}
-.bdg-form-foot{grid-column:1 / -1;display:grid;gap:var(--s3);align-items:center;}
-.bdg-form-foot p{font-size:var(--t-label);color:var(--muted);max-width:60ch;}
+/* Кнопка обычной ширины, как остальные на странице. Ряд с ней — обычный блок,
+   а не сетка: иначе кнопка растягивалась бы на всю строку. */
+.bdg-form button.bdg-btn{cursor:pointer;}
+/* Волосок над кнопкой отделяет действие от полей. Без него, когда сняли абзац
+   с пояснением, кнопка висела в пустоте и низ карточки читался как обрезанный. */
+.bdg-form-foot{
+  grid-column:1 / -1;margin-top:var(--s1);
+  padding-top:var(--s4);border-top:1px solid var(--line-soft);
+}
 /* Ловушка для ботов: живое поле, которое видит только робот. Скрыто уводом
    за край, а не display:none — часть автозаполнялок игнорирует скрытые
    правилом display, но послушно заполняет уведённое. Заполнено — письмо
@@ -494,7 +498,6 @@ figure.bdg-poster{position:relative;}
   /* Форма в один столбец: в половине узкой колонки поля по 130px, в них не
      видно ни телефона, ни имени файла. */
   .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
-  .bdg-form-foot p{max-width:none;}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
 
@@ -584,7 +587,7 @@ figure.bdg-poster{position:relative;}
       </div>
 
       <div class="bdg-field bdg-field--wide">
-        <label for="bdg-proof">Proof of purchase</label>
+        <label for="bdg-proof">Or proof of purchase</label>
         <input id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf">
         <p class="bdg-hint">A photo, screenshot or PDF of your receipt &mdash; JPG, PNG or PDF.</p>
       </div>
@@ -595,7 +598,6 @@ figure.bdg-poster{position:relative;}
       </div>
 
       <div class="bdg-form-foot">
-        <p>Please give us either a serial number or a proof of purchase &mdash; both is even better. Fields marked <span class="bdg-req">*</span> are required. We use your details only to verify your purchase and send your rebate code.</p>
         <button class="bdg-btn bdg-btn--solid" type="submit">Submit</button>
       </div>
     </form>

@@ -49,18 +49,20 @@ Suppressors». Если клиент захочет вернуть строку 
 пояснение было лишним. Тот же ход, что и в шапке, где две строки стали одной.
 
 **Подписи полей:** Full name\* · Email\* · Phone\* · Meprolight serial number ·
-Proof of purchase
+**Or** proof of purchase
 **Подсказка к файлу:** A photo, screenshot or PDF of your receipt — JPG, PNG or PDF.
-**Текст под формой:** Please give us either a serial number or a proof of purchase —
-both is even better. Fields marked \* are required. We use your details only to
-verify your purchase and send your rebate code.
 **Кнопка:** Submit
 
 Партнёр попросил: «a way for Mepro customer to enter their name, phone number,
 email, serial number or upload a proof of purchase». «Или» относится к паре
 серийник/чек, поэтому имя, телефон и почта обязательные, а из этой пары — ни
-одно: без JS браузер правило «хотя бы одно из двух» не проверит, и оно написано
-словами. Убирать эту фразу нельзя, она единственное, что несёт требование.
+одно: без JS браузер правило «хотя бы одно из двух» не проверит.
+
+Сначала это условие было написано абзацем под формой. Клиент абзац снял, и
+«или» переехало в саму подпись поля: **Or** proof of purchase, сразу под
+серийным номером. Одно слово вместо трёх строк, и условие видно там, где
+человек выбирает. ⚠️ Слово «Or» в подписи — не оборот речи, а требование
+партнёра; при правке подписей его нельзя потерять.
 
 ⚠️ Форма пока никуда не отправляет: адрес обработчика не выбран, см. DEPLOY.md.
 
