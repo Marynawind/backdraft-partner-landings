@@ -7,7 +7,7 @@
 ## 1. Welcome (hero)
 **Наверху:** логотип Meprolight, белая версия (без подписи рядом)
 
-**H1:** Welcome,<br>Meprolight customers!
+**H1:** Welcome!
 
 Перенос после «Welcome,» задан **жёстко** (`<br>`), а не отдан переносу по
 ширине: две строки нужны на любом экране. Так же сделано у [Guns.com](../guns/copy.md).
@@ -61,7 +61,15 @@ Proof of purchase
 в подписи поля незачем.
 **Кнопка выбора файла:** Choose file
 **Подсказка к файлу:** A photo, screenshot or PDF of your receipt — JPG, PNG or PDF.
+**Галочка согласия:** By submitting your mobile phone number and checking the
+box, you are consenting to receiving updates and marketing text messages from
+Outlier USA. Reply STOP to opt out.
 **Кнопка:** Submit
+
+Текст согласия прислал клиент, оставлен дословно. Галочка НЕ обязательная и НЕ
+проставлена заранее — согласие на рекламные сообщения человек даёт сам.
+⚠️ Просьбу сделать её обязательной сначала показать юристу: требовать согласия
+на маркетинговые SMS в обмен на рибейт по правилам США нельзя.
 
 Партнёр попросил: «a way for Mepro customer to enter their name, phone number,
 email, serial number or upload a proof of purchase». «Или» относится к паре
