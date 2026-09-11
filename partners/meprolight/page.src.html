@@ -359,10 +359,12 @@
    диалог открывается сам, скрипт не нужен.
 
    ⚠️ Поле именно ПРОЗРАЧНОЕ и в полный размер кнопки, а не спрятанное
-   (display:none, visibility:hidden, схлопнутое в 1px). Поле обязательное, и
-   по-настоящему скрытому Chrome не может показать подсказку «заполните поле»:
-   вместо подсказки он молча отказывается отправлять форму, а в консоль пишет
-   «not focusable». Прозрачность на это не влияет — бокс остаётся на месте.
+   (display:none, visibility:hidden, схлопнутое в 1px). Сейчас оно
+   необязательное, но стоит вернуть ему required — и по-настоящему скрытому
+   Chrome уже не сможет показать подсказку «заполните поле»: вместо подсказки
+   он молча откажется отправлять форму, а в консоль напишет «not focusable».
+   Прозрачность на это не влияет, бокс остаётся на месте, поэтому так и
+   оставлено — чтобы правка одного атрибута не сломала форму.
 
    ⚠️ Вторая цена приёма: имя выбранного файла показывать нечем — его рисовало
    родное поле, а без JS взять его неоткуда. */
@@ -583,7 +585,7 @@ figure.bdg-poster{position:relative;}
      на настоящий обработчик, форма ничего не отправляет. См. DEPLOY.md. -->
 <section class="bdg-claim" id="claim">
   <div class="bdg-wrap">
-    <h2>Fill out the form to get your code</h2>
+    <h2>Submit Meprolight Proof of Purchase and instantly receive your rebate code.</h2>
 
     <form class="bdg-form" method="post" enctype="multipart/form-data" action="REPLACE-WITH-FORM-ENDPOINT">
       <input type="hidden" name="partner" value="Meprolight Optics">
@@ -604,14 +606,14 @@ figure.bdg-poster{position:relative;}
       </div>
 
       <div class="bdg-field">
-        <label for="bdg-serial">Serial number <span class="bdg-req" aria-hidden="true">*</span></label>
-        <input id="bdg-serial" name="serial" type="text" autocomplete="off" required>
+        <label for="bdg-serial">Serial number</label>
+        <input id="bdg-serial" name="serial" type="text" autocomplete="off">
       </div>
 
       <div class="bdg-field bdg-field--wide">
-        <label for="bdg-proof">Proof of purchase <span class="bdg-req" aria-hidden="true">*</span></label>
+        <label for="bdg-proof">Or proof of purchase</label>
         <span class="bdg-file">
-          <input class="bdg-file-input" id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf" required>
+          <input class="bdg-file-input" id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf">
           <span class="bdg-file-btn" aria-hidden="true">Choose file</span>
         </span>
         <p class="bdg-hint">A photo, screenshot or PDF of your receipt &mdash; JPG, PNG or PDF.</p>
