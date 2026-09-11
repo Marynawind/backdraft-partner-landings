@@ -79,7 +79,7 @@
 .bdg-wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 var(--s4);}
 
 /* every section shares one vertical rhythm */
-.bdg-hero,.bdg-steps,.bdg-legal,.bdg-close{padding:var(--s8) 0 84px;}
+.bdg-hero,.bdg-claim,.bdg-steps,.bdg-legal,.bdg-close{padding:var(--s8) 0 84px;}
 
 /* buttons */
 .bdg-btn{
@@ -338,8 +338,7 @@
 .bdg-req{color:var(--brass-lit);}
 .bdg-form input[type="text"],
 .bdg-form input[type="email"],
-.bdg-form input[type="tel"],
-.bdg-form input[type="file"]{
+.bdg-form input[type="tel"]{
   -webkit-appearance:none;appearance:none;
   font-family:var(--f);font-size:var(--t-body);line-height:1.5;color:var(--text);
   width:100%;max-width:100%;margin:0;padding:var(--s2) var(--s3);
@@ -352,16 +351,39 @@
 /* :user-invalid, а не :invalid — иначе пустые обязательные поля краснеют
    сразу при загрузке, до того как человек их вообще тронул. */
 .bdg-form input:user-invalid{border-color:#D2705A;}
-/* Файловому полю нативную кнопку красим отдельно: сам input мы уже сбросили,
-   а ::file-selector-button наследует стиль системы, а не наш. */
-.bdg-form input[type="file"]{padding:var(--s1) var(--s2);}
-.bdg-form input[type="file"]::file-selector-button{
-  font-family:var(--f);font-size:var(--t-label);font-weight:700;color:var(--text);
-  margin-right:var(--s3);padding:var(--s1) var(--s3);cursor:pointer;
-  background:transparent;border:1px solid var(--line);border-radius:var(--radius);
+/* Выбор файла — своей кнопкой поверх родного поля.
+   Надпись на родной кнопке (и «файл не выбран» рядом) рисует браузер и берёт
+   её из языка СВОЕГО интерфейса: у русской сборки Chrome там русские слова, и
+   ни CSS, ни атрибут lang их не меняют. Поэтому сверху лежит наша надпись, а
+   родное поле растянуто на неё же и сделано прозрачным: клик попадает в него,
+   диалог открывается сам, скрипт не нужен.
+
+   ⚠️ Поле именно ПРОЗРАЧНОЕ и в полный размер кнопки, а не спрятанное
+   (display:none, visibility:hidden, схлопнутое в 1px). Поле обязательное, и
+   по-настоящему скрытому Chrome не может показать подсказку «заполните поле»:
+   вместо подсказки он молча отказывается отправлять форму, а в консоль пишет
+   «not focusable». Прозрачность на это не влияет — бокс остаётся на месте.
+
+   ⚠️ Вторая цена приёма: имя выбранного файла показывать нечем — его рисовало
+   родное поле, а без JS взять его неоткуда. */
+.bdg-file{position:relative;display:inline-block;align-self:start;}
+.bdg-file-input{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;cursor:pointer;
+}
+.bdg-file-btn{
+  display:inline-block;pointer-events:none;
+  font-size:var(--t-label);font-weight:700;color:var(--text);
+  padding:var(--s2) var(--s4);
+  border:1px solid var(--line);border-radius:var(--radius);
   transition:border-color .18s ease,color .18s ease;
 }
-.bdg-form input[type="file"]::file-selector-button:hover{border-color:var(--brass);color:var(--brass-lit);}
+.bdg-file:hover .bdg-file-btn{border-color:var(--brass);color:var(--brass-lit);}
+/* Рамка фокуса — на надписи, потому что само поле прозрачное. :has читают все
+   нынешние браузеры; где не прочтут, фокус просто не подсветится. */
+.bdg-file:has(.bdg-file-input:focus-visible) .bdg-file-btn{
+  outline:2px solid var(--brass-lit);outline-offset:2px;border-color:var(--brass);
+}
 .bdg-hint{font-size:var(--t-label);color:var(--muted);}
 /* Кнопка обычной ширины, как остальные на странице. Ряд с ней — обычный блок,
    а не сетка: иначе кнопка растягивалась бы на всю строку. */
@@ -582,13 +604,16 @@ figure.bdg-poster{position:relative;}
       </div>
 
       <div class="bdg-field">
-        <label for="bdg-serial">Meprolight serial number</label>
-        <input id="bdg-serial" name="serial" type="text" autocomplete="off">
+        <label for="bdg-serial">Meprolight serial number <span class="bdg-req" aria-hidden="true">*</span></label>
+        <input id="bdg-serial" name="serial" type="text" autocomplete="off" required>
       </div>
 
       <div class="bdg-field bdg-field--wide">
-        <label for="bdg-proof">Or proof of purchase</label>
-        <input id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf">
+        <label for="bdg-proof">Proof of purchase <span class="bdg-req" aria-hidden="true">*</span></label>
+        <span class="bdg-file">
+          <input class="bdg-file-input" id="bdg-proof" name="proof" type="file" accept="image/*,application/pdf" required>
+          <span class="bdg-file-btn" aria-hidden="true">Choose file</span>
+        </span>
         <p class="bdg-hint">A photo, screenshot or PDF of your receipt &mdash; JPG, PNG or PDF.</p>
       </div>
 
