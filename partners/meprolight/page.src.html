@@ -172,6 +172,12 @@
    1.34/.66 — не на глаз: при 1440 строка «Meprolight customers!» занимает 692px
    из 766px колонки, свободного места было 74px. Отдали рисунку 55px, запас в
    ~19px оставлен намеренно — иначе заголовок сорвётся на третью строку. */
+/* Логотип живёт ВНУТРИ левой колонки, а не над сеткой. Это не оформление:
+   рисунок справа центрируется по колонке, и пока логотип стоял снаружи, он в
+   расчёт не входил — рисунок оказывался ниже середины левого блока на половину
+   высоты логотипа (замер: 69px при 901 и 95px при 1440). Перенос внутрь чинит
+   это сам, без сдвига на подобранное число, и держится при любом размере
+   логотипа. */
 .bdg-herogrid{display:grid;grid-template-columns:minmax(0,1.34fr) minmax(0,.66fr);gap:var(--s6);align-items:center;}
 .bdg-hero h1{font-size:var(--t-h1);color:#fff;}
 .bdg-rule{width:80px;height:3px;background:var(--brass);margin-top:var(--s4);}
@@ -596,11 +602,11 @@ figure.bdg-poster{position:relative;}
 <!-- 1. Welcome -->
 <section class="bdg-hero">
   <div class="bdg-wrap">
-    <div class="bdg-cobrand">
-      <img src="assets/meprolight-logo.svg" width="213" height="126" alt="Meprolight Optics">
-    </div>
     <div class="bdg-herogrid">
       <div>
+      <div class="bdg-cobrand">
+        <img src="assets/meprolight-logo.svg" width="213" height="126" alt="Meprolight Optics">
+      </div>
         <h1><span>Welcome!</span></h1>
         <div class="bdg-rule"></div>
         <div class="bdg-cta-row">
