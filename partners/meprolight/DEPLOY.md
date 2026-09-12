@@ -14,7 +14,7 @@ SEO-вес уходит не на backdraftsuppressors.com, а партнёру 
 
 1. **Storefront → Web Pages → Create a Web Page**
 2. Page Type: **Contains its own content** (не «Link to…»)
-3. **Page Name:** `Master FFL`
+3. **Page Name:** `Meprolight Optics`
 4. **Page Content** → нажать кнопку источника HTML (`<>` / «Source code» в TinyMCE)
    и вставить **всё содержимое `bigcommerce-page.html`** целиком.
    ⚠️ Только в режиме HTML-источника — визуальный редактор вырежет `<style>`.
@@ -23,8 +23,9 @@ SEO-вес уходит не на backdraftsuppressors.com, а партнёру 
 5. **Navigation Menu Options** → снять галку «Show this web page in the navigation menu».
    Страница нужна только по прямой ссылке для клиентов Meprolight.
 6. **Page URL / SEO** → задать URL вручную: `/Meprolight`
-   (по умолчанию BigCommerce подставит `/gun-owners-of-america/`).
-7. **Page Title (SEO):** `Master FFL Members — Free Suppressor Rebate | Backdraft Suppressors`
+   (по умолчанию BigCommerce слепит адрес из названия страницы —
+   получится что-то вроде `/meprolight-optics/`).
+7. **Page Title (SEO):** `Meprolight Optics Customers — Free Suppressor Rebate | Backdraft Suppressors`
    **Meta Description:** `Meprolight Optics customers: redeem your Free Suppressor Rebate on a 4" Hunter Suppressor at Backdraft Suppressors. Four redemption steps and full rebate terms.`
 8. Save → открыть `https://backdraftsuppressors.com/Meprolight`.
 
@@ -603,7 +604,7 @@ Script Manager годится и `Footer`, и `Header`.
 ## Проверить после публикации
 - [ ] Открывается по `/Meprolight`
 - [ ] Тёмные блоки во всю ширину, без белых полей по бокам
-- [ ] Логотип Master FFL виден вверху страницы
+- [ ] Логотип Meprolight виден вверху страницы
 - [ ] На глушителе написано BH4, а не BP4
 - [ ] Шесть шагов видны текстом, номера в латунных кружках
 - [ ] Инфографика над шагами, без чёрного прямоугольника и без карточек 1-2-3-4
@@ -611,6 +612,13 @@ Script Manager годится и `Footer`, и `Header`.
 - [ ] Кнопки открывают backdraftsuppressors.com и все ведут на живые страницы
 - [ ] На узком экране все картинки уменьшаются вместе с окном, ничего не пропадает
 - [ ] Страница не появилась в главном меню магазина
+- [ ] **Форма: Submit с пустыми серийником и чеком НЕ отправляет заявку**
+      (заполнить имя, почту, телефон, поставить галочку — форма должна
+      показать «Enter the serial number or attach your proof of purchase»).
+      Отправилась — тема вырезала скрипт, см. раздел про Script Manager.
+- [ ] Форма: Submit без галочки не отправляет заявку
+- [ ] Форма: заполнить всё и отправить по-настоящему — заявка дошла
+      до обработчика со всеми полями
 
 ## Если тема вырезает `<style>`
 Некоторые сборки Stencil чистят inline-стили. Тогда содержимое `<style>`
