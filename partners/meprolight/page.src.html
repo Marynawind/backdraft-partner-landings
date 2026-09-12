@@ -334,9 +334,15 @@
 .bdg-claim{position:relative;background:var(--recess);border-bottom:1px solid var(--line);}
 .bdg-claim h2{font-size:clamp(24px,2.4vw,30px);color:#fff;}
 
+/* Два столбца, а не три: обязательных полей четыре, и в ряду по три одно
+   из них оставалось бы в строке в одиночку, с двумя пустыми клетками рядом.
+   Пара на ряд читается как пара: сверху кто человек, снизу — телефон и дата
+   рождения, то есть всё, что нужно оператору SMS, прямо над согласием на них.
+   Столбец выходит около 520px — примерно во столько же упирается блок
+   «серийник или чек» ниже, так что поля по ширине не спорят. */
 .bdg-form{
   margin-top:var(--s6);
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--s3);
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s3);
   border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:var(--radius);
   background:var(--lift);padding:var(--pad-card);
 }
@@ -359,13 +365,32 @@
 .bdg-req{color:var(--brass-lit);}
 .bdg-form input[type="text"],
 .bdg-form input[type="email"],
-.bdg-form input[type="tel"]{
+.bdg-form input[type="tel"],
+.bdg-form input[type="date"]{
   -webkit-appearance:none;appearance:none;
   font-family:var(--f);font-size:var(--t-body);line-height:1.5;color:var(--text);
   width:100%;max-width:100%;margin:0;padding:var(--s2) var(--s3);
   background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:var(--radius);
   transition:border-color .18s ease;
 }
+/* Дата рождения — родное поле с календарём, без JS и без маски ввода: формат
+   показа браузер берёт из языка своего интерфейса, а уходит значение всегда
+   как YYYY-MM-DD, что обработчику и нужно.
+   ⚠️ color-scheme:dark обязателен: иначе Chrome рисует значок календаря и сам
+   выпадающий календарь по-светлому, и на тёмной форме значок пропадает.
+   ⚠️ min-height — из-за Safari: там дата верстается по своей внутренней высоте
+   и поле выходит ниже соседних. Считается из тех же отступов и интерлиньяжа,
+   что у текстовых полей, поэтому подогнанных чисел здесь нет. */
+.bdg-form input[type="date"]{
+  color-scheme:dark;
+  min-height:calc(1.5em + var(--s2) * 2 + 2px);
+}
+/* Пустое поле даты браузер заполняет подсказкой «mm/dd/yyyy» в полный цвет
+   текста, и среди пустых соседей оно одно выглядело заполненным. Красим её
+   в цвет плейсхолдера. Зацепка за :invalid — единственная: у даты нет
+   :placeholder-shown, а незаполненное обязательное поле всегда :invalid и
+   перестаёт им быть ровно тогда, когда дата введена целиком. */
+.bdg-form input[type="date"]:invalid::-webkit-datetime-edit{color:#8C8981;}
 .bdg-form input::placeholder{color:#8C8981;}
 .bdg-form input:hover{border-color:rgba(255,255,255,.28);}
 .bdg-form input:focus{outline:2px solid var(--brass-lit);outline-offset:2px;border-color:var(--brass);}
@@ -562,6 +587,9 @@ figure.bdg-poster{position:relative;}
   .bdg-ready p,.bdg-notecard p{max-width:none;}
   .bdg-wrap{padding:0 var(--s3);}
   .bdg-ready{gap:var(--s3);}
+  /* Форма в один столбец. Раньше складывалась на 900px, потому что три поля
+     в ряд давали там колонки по 170px; в два столбца до 620px просторно. */
+  .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
 
   /* Шапка на телефоне держит десктопную композицию — текст слева,
      иллюстрация справа, кнопки в ряд, — но кегль здесь не упирается в
@@ -589,9 +617,6 @@ figure.bdg-poster{position:relative;}
      здесь уже узкая: два ряда кнопок в ней ломают надписи на три строки.
      Разворачиваем ряд в столбик — ширина у кнопок остаётся общей. */
   .bdg-cta-row{grid-auto-flow:row;gap:var(--s2);}
-  /* Форма в один столбец: три поля в ряд тут дают колонки по 170px, в которых
-     не помещается ни почта, ни телефон. */
-  .bdg-form{grid-template-columns:minmax(0,1fr);gap:var(--s4);}
 }
 @media (max-width:380px){
   .bdg{--pad-card:20px;}
@@ -644,6 +669,16 @@ figure.bdg-poster{position:relative;}
       <div class="bdg-field">
         <label for="bdg-phone">Phone <span class="bdg-req" aria-hidden="true">*</span></label>
         <input id="bdg-phone" name="phone" type="tel" autocomplete="tel" required>
+      </div>
+
+      <!-- Дата рождения обязательна не по нашей прихоти: сервис рассылки SMS
+           не принимает подписчика без неё. Подписи с причиной под полем нет —
+           снята по просьбе клиента.
+           min стоит, max нет: любой статический «не позже» устареет сам собой
+           уже через год, а страница собирается один раз. -->
+      <div class="bdg-field">
+        <label for="bdg-dob">Date of birth <span class="bdg-req" aria-hidden="true">*</span></label>
+        <input id="bdg-dob" name="dob" type="date" autocomplete="bday" min="1900-01-01" required>
       </div>
 
       <div class="bdg-either">
