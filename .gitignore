@@ -11,3 +11,4 @@ partners/*/preview.html
 /IMG_*.jpg
 /IMG_*.png
 /WhatsApp Image*
+__pycache__/

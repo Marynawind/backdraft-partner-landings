@@ -11,6 +11,12 @@ name each asset exactly once — the hero artwork is a CSS background rather tha
 an <img> precisely so the sheen mask can reuse the same custom property instead
 of carrying a second copy of the same 58 KB.
 
+Комментарии из вывода вырезаются. В page.src.html их много и они там нужны,
+но покупатель открывает «просмотр кода» на витрине магазина и видит ровно то,
+что мы туда положили: заметки о том, что в теме что-то может отвалиться, и
+предупреждения для самих себя — не то чтение, которое стоит показывать.
+Исходник от этого не страдает: правится всё равно только он.
+
 Outputs:
   bigcommerce-page.html  paste this into BigCommerce
   preview.html           the same page plus a mock store header/footer
@@ -39,6 +45,121 @@ PREVIEW_HEAD = """<title>Meprolight Optics Rebate</title>
 <div class="mock-note">Preview mock &mdash; the store header and footer are rendered by the BigCommerce theme</div>
 """
 PREVIEW_FOOT = '<div class="mock-footer">&copy; 2026 Backdraft Suppressors &mdash; preview mock of the store footer</div>\n'
+
+
+def strip_css_comments(css: str) -> str:
+    """Вырезать /* … */ из CSS, не тронув содержимое строк."""
+    out, i, n = [], 0, len(css)
+    while i < n:
+        c = css[i]
+        if c in "\"'":
+            quote = c
+            out.append(c)
+            i += 1
+            while i < n:
+                if css[i] == "\\":
+                    out.append(css[i:i + 2])
+                    i += 2
+                    continue
+                out.append(css[i])
+                i += 1
+                if css[i - 1] == quote:
+                    break
+            continue
+        if css.startswith("/*", i):
+            end = css.find("*/", i + 2)
+            i = n if end == -1 else end + 2
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+# После этих символов «/» начинает регулярное выражение, а не делит. Список
+# нужен, чтобы не съесть /[^A-Za-z0-9-]/g в чистке кода рибейта как комментарий.
+REGEX_AFTER = set("(,=:[!&|?+-*%{};\n") | {""}
+
+
+def strip_js_comments(js: str) -> str:
+    """Вырезать // и /* … */ из JS.
+
+    Разбор посимвольный, потому что «//» внутри строки ('https://…') и «/» в
+    начале регулярного выражения выглядят как начало комментария, а таковыми
+    не являются. Регулярка вместо разбора здесь молча портит рабочий код.
+    """
+    out, i, n, prev = [], 0, len(js), ""
+    while i < n:
+        c = js[i]
+        if c in "\"'`":
+            quote = c
+            out.append(c)
+            i += 1
+            while i < n:
+                if js[i] == "\\":
+                    out.append(js[i:i + 2])
+                    i += 2
+                    continue
+                out.append(js[i])
+                i += 1
+                if js[i - 1] == quote:
+                    break
+            prev = quote
+            continue
+        if js.startswith("//", i):
+            end = js.find("\n", i)
+            i = n if end == -1 else end
+            continue
+        if js.startswith("/*", i):
+            end = js.find("*/", i + 2)
+            i = n if end == -1 else end + 2
+            continue
+        if c == "/" and prev in REGEX_AFTER:
+            out.append(c)
+            i += 1
+            in_class = False
+            while i < n:
+                if js[i] == "\\":
+                    out.append(js[i:i + 2])
+                    i += 2
+                    continue
+                if js[i] == "[":
+                    in_class = True
+                elif js[i] == "]":
+                    in_class = False
+                elif js[i] == "/" and not in_class:
+                    out.append(js[i])
+                    i += 1
+                    break
+                out.append(js[i])
+                i += 1
+            while i < n and js[i].isalpha():      # флаги регулярки
+                out.append(js[i])
+                i += 1
+            prev = "/"
+            continue
+        out.append(c)
+        i += 1
+        if not c.isspace():
+            prev = c
+    return "".join(out)
+
+
+def strip_comments(page: str) -> str:
+    """Убрать из выдачи все комментарии — HTML, CSS и JS."""
+    def css(m):
+        return "<style>" + strip_css_comments(m.group(1)) + "</style>"
+
+    def js(m):
+        return "<script>" + strip_js_comments(m.group(1)) + "</script>"
+
+    # Сначала блоки: иначе «-->» внутри JS-комментария оборвал бы вырезание HTML
+    page = re.sub(r"<style>(.*?)</style>", css, page, flags=re.S)
+    page = re.sub(r"<script>(.*?)</script>", js, page, flags=re.S)
+    page = re.sub(r"<!--.*?-->", "", page, flags=re.S)
+    # Пустые строки, оставшиеся от вырезанных комментариев
+    page = re.sub(r"[ \t]+\n", "\n", page)
+    page = re.sub(r"\n{3,}", "\n\n", page)
+    return page
 
 
 def poster(page: str) -> str:
@@ -107,6 +228,9 @@ def check_deploy_copy(page: str) -> None:
     страницы, тот же код кладут в Script Manager — копипастом из инструкции.
     План работает ровно до тех пор, пока копия совпадает с оригиналом, а
     разойтись они могут молча. Поэтому сборка их сверяет и падает.
+
+    Сверяется вычищенный от комментариев вариант — тот самый, что уходит
+    в магазин: из Script Manager код точно так же виден в исходнике страницы.
     """
     m = re.search(r"<script>.*?</script>", page, re.S)
     if not m:
@@ -118,9 +242,12 @@ def check_deploy_copy(page: str) -> None:
 
 
 if __name__ == "__main__":
-    page_src = PAGE.read_text(encoding="utf-8")
-    check_deploy_copy(page_src)
-    standalone = inline(poster(page_src))
+    # Порядок важен: комментарии режутся ДО вшивания картинок. Потом в файле
+    # лежит base64 на сотни килобайт, и любой разбор его содержимого — лишний
+    # риск на ровном месте.
+    clean = strip_comments(poster(PAGE.read_text(encoding="utf-8")))
+    check_deploy_copy(clean)
+    standalone = inline(clean)
     for name, body in (("bigcommerce-page.html", standalone),
                        ("preview.html", PREVIEW_HEAD + standalone + PREVIEW_FOOT)):
         out = HERE / name

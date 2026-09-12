@@ -621,7 +621,7 @@ purchase», и форму не пускает всё тот же встроен�
     if (!serial || !proof || !serial.setCustomValidity) return;
 
     function check() {
-      // .files есть везде, где есть setCustomValidity; проверка на всякий случай
+
       var filled = serial.value.trim() !== '' ||
                    (proof.files ? proof.files.length > 0 : proof.value !== '');
       var message = filled ? '' : 'Enter the serial number or attach your proof of purchase.';
@@ -631,16 +631,8 @@ purchase», и форму не пускает всё тот же встроен�
 
     serial.addEventListener('input', check);
     proof.addEventListener('change', check);
-    check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+    check();
 
-    /* Отправка без ухода со страницы.
-
-       Без этого куска форма всё равно рабочая: браузер уйдёт на verp и покажет
-       купон там, не на нашей странице. Но уход с витрины рвёт сессию и корзину
-       покупателя, поэтому запрос идёт фоном, а ответ рисуется на месте формы.
-
-       ⚠️ Браузер без fetch или FormData ничего не перехватывает и отправляет
-       форму обычным способом. Это и есть запасной путь, а не поломка. */
     if (!window.fetch || !window.FormData) return;
 
     var btn = form.querySelector('button[type="submit"]');
@@ -649,23 +641,15 @@ purchase», и форму не пускает всё тот же встроен�
 
     var out = document.createElement('div');
     out.className = 'bdg-result';
-    /* Блок рождается уже после загрузки страницы, и экранный диктор сам его не
-       заметит: код появится молча. role/aria-live заставляют прочитать его. */
+
     out.setAttribute('role', 'status');
     out.setAttribute('aria-live', 'polite');
     out.hidden = true;
     form.parentNode.insertBefore(out, form.nextSibling);
 
-    /* Заголовок секции — «Submit Meprolight Proof of Purchase…». Когда форма
-       уступает место коду, он начинает врать, поэтому прячется вместе с ней. */
     var heading = form.previousElementSibling;
     if (!heading || heading.tagName !== 'H2') heading = null;
 
-    /* Узлы собираются DOM-методами, а текст кладётся через textContent.
-       Это не стилистика: строки ниже приходят с сервера, и склейка их
-       в innerHTML означала бы, что любой текст оттуда исполняется на витрине
-       магазина как разметка. Полагаться на то, что на том конце ничего
-       никогда не поменяется, — не наша роль. */
     function el(tag, className, text) {
       var node = document.createElement(tag);
       if (className) node.className = className;
@@ -680,14 +664,6 @@ purchase», и форму не пускает всё тот же встроен�
       out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    /* Копирование кода. Код набирают руками на кассе, и ошибиться в нём легко:
-       кнопка рядом надёжнее, чем выделять мышью мелкий текст на телефоне.
-
-       Три ступени, сверху вниз: современный clipboard API; старый execCommand
-       для браузеров без него и для страниц, открытых не по https; а если не
-       вышло и это — код просто выделяется, человеку остаётся нажать копирование
-       самому. Молча не делать ничего нельзя: нажали кнопку — что-то должно
-       произойти. */
     function flash(button, text) {
       button.textContent = text;
       button.className = 'bdg-copy is-done';
@@ -701,9 +677,7 @@ purchase», и форму не пускает всё тот же встроен�
     function legacyCopy(text) {
       var ta = document.createElement('textarea');
       ta.value = text;
-      /* Уведено за край, а не спрятано правилом: из скрытого display:none поля
-         выделять нечего, и копирование вернёт пустоту. readonly — чтобы на
-         телефоне не выезжала клавиатура. */
+
       ta.setAttribute('readonly', '');
       ta.style.position = 'absolute';
       ta.style.left = '-9999px';
@@ -723,13 +697,12 @@ purchase», и форму не пускает всё тот же встроен�
         var sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
-      } catch (err) { /* выделить не вышло — код и так на экране */ }
+      } catch (err) {  }
     }
 
     function copyButton(text, codeNode) {
       var button = el('button', 'bdg-copy', 'Copy');
-      /* ⚠️ type обязателен: кнопка вне формы, но тема магазина может завернуть
-         страницу в свою, и тогда кнопка без type отправит её. */
+
       button.type = 'button';
 
       function fallback() {
@@ -760,37 +733,26 @@ purchase», и форму не пускает всё тот же встроен�
 
     var sending = false;
 
-    /* ⚠️ submit не наступает, пока форма невалидна, — значит check() выше
-       по-прежнему стережёт «серийник или чек», и переносить его не пришлось. */
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      /* ⚠️ Не лишняя проверка: Enter в текстовом поле отправляет форму даже
-         тогда, когда кнопка выключена. Без флага уходил бы второй запрос —
-         и второе SMS покупателю. */
       if (sending) return;
       sending = true;
 
       btn.disabled = true;
       btn.textContent = 'Sending\u2026';
 
-      /* Различаем «не достучались» и «ответили не тем»: покупателю незачем
-         проверять свой интернет, когда упал наш сервер. */
       var reached = false;
 
       fetch(form.action, {
         method: 'POST',
         body: new FormData(form),
-        /* ⚠️ Без этого заголовка сервер отвечает целой HTML-страницей — так
-           устроен запасной путь для формы без скрипта. Здесь нужен JSON. */
+
         headers: { 'Accept': 'application/json' }
       })
         .then(function (r) {
           reached = true;
-          /* Не по r.ok: отказ по полям приходит статусом 422 и тоже JSON,
-             его надо разобрать и показать. А вот не-JSON — это уже не наш
-             протокол: 500, заглушка защиты, отказ из-за размера фото.
-             Content-Type читается и с чужого домена, разрешения не нужно. */
+
           var type = r.headers.get('content-type') || '';
           if (type.indexOf('json') === -1) throw new Error('not json');
           return r.json();
@@ -812,18 +774,11 @@ purchase», и форму не пускает всё тот же встроен�
             return;
           }
 
-          /* Код набирают руками на кассе, поэтому из него выбрасывается всё,
-             кроме букв, цифр и дефиса: невидимый пробел с той стороны — это
-             код, который не сработает, а человек не поймёт почему. */
           var code = String(b.code || '').replace(/[^A-Za-z0-9-]/g, '');
 
           form.hidden = true;
           if (heading) heading.hidden = true;
 
-          /* Заявка принята, а кода в ответе нет. Так быть не должно, но пустой
-             блок под заголовком «Your rebate code» — худшее, что можно
-             показать: человек решит, что всё сломалось, хотя код уже выпущен
-             и уходит письмом. */
           if (!code) {
             show([
               el('p', 'bdg-result-title', 'Your claim is in'),
@@ -870,11 +825,6 @@ purchase», и форму не пускает всё тот же встроен�
     });
   }
 
-  /* Ждать разметку, если код выполняется раньше неё. Здесь, в конце фрагмента,
-     форма уже существует и init() пойдёт сразу. Ожидание нужно не для этого
-     места, а для запасного: если BigCommerce вырежет скрипт из страницы, ровно
-     этот же код кладётся в Script Manager, а он вставляет его в <head>, то есть
-     до формы. Так один и тот же текст работает в обоих местах без правок. */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -883,6 +833,10 @@ purchase», и форму не пускает всё тот же встроен�
 })();
 </script>
 ```
+
+Код здесь без комментариев — ровно в том виде, в каком его собирает `build.py`
+и в каком он уходит в магазин: из Script Manager он так же виден в исходнике
+страницы. Тот же код с объяснениями, что и зачем, — в конце `page.src.html`.
 
 Код специально написан так, чтобы работать в обоих местах без правок: если
 разметки ещё нет, он дожидается её события `DOMContentLoaded`. Поэтому в
