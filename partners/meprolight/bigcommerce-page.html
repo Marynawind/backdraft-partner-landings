@@ -411,19 +411,21 @@
 /* Кнопка обычной ширины, как остальные на странице. Ряд с ней — обычный блок,
    а не сетка: иначе кнопка растягивалась бы на всю строку. */
 .bdg-form button.bdg-btn{cursor:pointer;}
-/* Согласие на рассылку. Галочка НЕ обязательная и НЕ проставлена заранее:
-   согласие на рекламные сообщения человек даёт сам, иначе это не согласие.
-   ⚠️ Если клиент попросит сделать её обязательной — сперва пусть спросит
-   юриста: требовать согласия на маркетинговые SMS в обмен на рибейт по
-   правилам США нельзя.
+/* Согласие на рассылку и подтверждение возраста — ОДНА галочка, обязательная.
+   Заранее она не проставлена: галочка, поставленная за человека, согласием
+   не считается нигде.
+
+   ⚠️⚠️ Здесь сознательно принят юридический риск, и это решение клиента.
+   Галочка обязательная, а в её тексте — согласие на маркетинговые SMS. Значит
+   без согласия на рекламу рибейт не получить, а по правилам США (TCPA)
+   требовать согласия на маркетинговые сообщения как условие получения выгоды
+   нельзя. Разводить обратно на две галочки — возраст обязательный, SMS
+   добровольное — это правка на пять строк: так и было сделано в прошлой
+   версии, история помнит.
+
    Подпись здесь — обычный текст, а не ярлык поля, поэтому правило
    .bdg-field label её не касается: она намеренно вне .bdg-field. */
-/* Галочек две, и они не равны по весу: возраст обязателен и его проверяет
-   браузер, согласие на SMS — добровольное. Поэтому разделены, а не слиты в
-   одну строку: обязательная галочка с текстом про маркетинг означала бы, что
-   без согласия на рекламу рибейт не получить (см. предупреждение выше). */
-.bdg-consents{display:grid;gap:var(--s3);margin-bottom:var(--s4);}
-.bdg-consent{display:flex;gap:var(--s2);align-items:flex-start;max-width:78ch;}
+.bdg-consent{display:flex;gap:var(--s2);align-items:flex-start;max-width:78ch;margin-bottom:var(--s4);}
 .bdg-consent input{
   flex:none;width:18px;height:18px;margin:2px 0 0;   /* 2px — оптически по первой строке */
   accent-color:var(--brass);cursor:pointer;
@@ -435,9 +437,6 @@
   color-scheme:dark;
 }
 .bdg-consent label{font-size:var(--t-label);line-height:1.5;color:var(--muted);cursor:pointer;}
-/* Подтверждение возраста — не мелкий шрифт внизу формы, а обязательное
-   действие наравне с полями, поэтому в цвет основного текста. */
-.bdg-consent--req label{color:var(--text);}
 
 /* Волосок над кнопкой отделяет действие от полей. Без него, когда сняли абзац
    с пояснением, кнопка висела в пустоте и низ карточки читался как обрезанный. */
@@ -678,22 +677,16 @@ figure.bdg-poster{position:relative;}
       </div>
 
       <div class="bdg-form-foot">
-        <div class="bdg-consents">
-          <!-- Возраст человек подтверждает сам: даты рождения в форме нет, её
-               клиент снял. Галочка обязательная, поэтому форма без неё не
-               уйдёт — это проверяет сам браузер, без JS.
-               ⚠️ Это подтверждение, а не проверка: страница НЕ знает возраст
-               и проверить его не может. Документ смотрит FFL/SOT при передаче
-               глушителя — там настоящая проверка и происходит. -->
-          <div class="bdg-consent bdg-consent--req">
-            <input id="bdg-age" name="age_21" type="checkbox" value="yes" required>
-            <label for="bdg-age">I certify that I am 21 years of age or older. <span class="bdg-req" aria-hidden="true">*</span></label>
-          </div>
-
-          <div class="bdg-consent">
-            <input id="bdg-sms" name="sms_consent" type="checkbox" value="yes">
-            <label for="bdg-sms">By submitting your mobile phone number and checking the box, you are consenting to receiving updates and marketing text messages from Outlier USA. Reply STOP to opt out.</label>
-          </div>
+        <!-- Возраст и согласие на SMS — в одной обязательной галочке, по
+             просьбе клиента. Форма без неё не уйдёт, это проверяет браузер,
+             JS не нужен. Про юридический риск такой связки — предупреждение
+             в CSS у .bdg-consent.
+             ⚠️ Возраст здесь ПОДТВЕРЖДАЮТ, а не проверяют: страница его не
+             знает и узнать не может. Документ смотрит FFL/SOT при передаче
+             глушителя — там настоящая проверка и происходит. -->
+        <div class="bdg-consent">
+          <input id="bdg-sms" name="sms_consent" type="checkbox" value="yes" required>
+          <label for="bdg-sms">By submitting your mobile phone number and checking the box, you are confirming that you are 21 years of age or older and consenting to receiving updates and marketing text messages from Outlier USA. Reply STOP to opt out. <span class="bdg-req" aria-hidden="true">*</span></label>
         </div>
         <button class="bdg-btn bdg-btn--solid" type="submit">Submit</button>
       </div>
