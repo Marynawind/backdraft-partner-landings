@@ -449,25 +449,42 @@ RGB одним цветом латуни — весь тональный рис�
 Проверено: с включённым reduced-motion шапка рендерится точно так же, как
 после отработавшей анимации.
 
-## ⚠️ Форма «Claim Your Rebate» — адреса ещё нет
-
-В разметке стоит заглушка:
+## Форма «Claim Your Rebate» — куда она уходит
 
 ```html
 <form class="bdg-form" method="post" enctype="multipart/form-data"
-      action="REPLACE-WITH-FORM-ENDPOINT">
+      action="https://verp.getoutlier.com/rebate-claim/">
 ```
 
-**Пока `action` не заменён, форма ничего не отправляет** — браузер уйдёт в никуда.
-Публиковать страницу с заглушкой нельзя.
+Заявку принимает **Outlier VERP** — наша собственная система, а не сторонний
+сервис форм. Что она делает за один запрос: записывает заявку, генерирует код
+`ML-XXXXXX`, кладёт его в промо-акцию BigCommerce (промо 24, где уже настроена
+скидка), отправляет SMS и письмо — и возвращает код на страницу.
 
-Форма намеренно обычная, без JS: `method="post"`, `enctype="multipart/form-data"`
-(иначе файл не уйдёт). Значит подойдёт любой обработчик, принимающий обычный
-POST формы с файлом. Что нужно от него:
+**Ответ в JSON:**
 
-1. приём `multipart/form-data` с полем `proof` (файл);
-2. письмо или запись в таблицу с полями `name`, `email`, `phone`, `serial`,
-   `partner` и `sms_consent`;
+```json
+{"ok": true, "code": "ML-4K2P9X", "already_issued": false, "sms": true}
+{"ok": false, "error": "…", "errors": {"email": ["Enter a valid email address."]}}
+```
+
+⚠️ **Запрос обязан слать `Accept: application/json`** — иначе сервер отвечает
+готовой HTML-страницей с купоном. Так сделано намеренно: это запасной путь для
+формы, отправленной без скрипта, и человек видит свой код, а не голый JSON.
+
+⚠️ **Отвечает только этой витрине.** Сервер сверяет заголовок `Origin` с
+`https://backdraftsuppressors.com` и чужой странице отказывает. Значит форму
+нельзя проверить с локального файла или с другого домена — только с
+опубликованной страницы магазина.
+
+⚠️ **Акция включается вручную.** Пока её не включили на стороне VERP, форма
+отвечает «This rebate programme is not open» — это нормальный ответ, а не
+поломка. Включают после проверки префикса кодов и суточного потолка.
+
+### Что приходит на сервер
+
+Поля `name`, `email`, `phone`, `serial`, `proof`, `partner`, `sms_consent`
+и ловушка `_gotcha`.
 
    `sms_consent` — одна галочка на две вещи сразу: согласие на SMS и
    подтверждение «мне 21 или больше». Галочка обязательная, поэтому приходит
@@ -490,13 +507,17 @@ POST формы с файлом. Что нужно от него:
    рассылки SMS (SlickText) не заводит подписчика без даты рождения, галочка
    его не заменит: дату придётся либо собирать в его собственном шаге
    подтверждения подписки, либо вернуть поле в форму.
-3. страница «спасибо» после отправки — у большинства сервисов это скрытое поле
-   `_next` со ссылкой, добавляется одной строкой;
-4. отбрасывать письма, где заполнено поле `_gotcha` — это ловушка для ботов,
-   живой человек её не видит.
 
-Поле `partner` со значением `Meprolight Optics` уже лежит в форме скрытым: один
-обработчик сможет обслуживать все партнёрские страницы, отличая их по этому полю.
+Поле `partner` со значением `Meprolight Optics` сервер сверяет со своей
+настройкой: разойдутся — заявка будет отклонена, а не принята «куда-нибудь».
+
+Ловушку `_gotcha` сервер отбрасывает сам, как и повторный сабмит той же
+формы в пределах двух минут — он возвращает тот же код, а не печатает второй.
+Купил у партнёра ещё раз позже — получит новый код, это не «один на человека».
+
+**Файл чека:** любая картинка и PDF, до 25 МБ. Проверяется по типу содержимого,
+а не по расширению — фото, присланное из другого приложения, приходит с именем
+`blob` и без расширения вовсе.
 
 ⚠️ **Проверить сразу после вставки в BigCommerce**, что тема не вырезала `<form>`
 и не завернула страницу в свою форму: вложенная `<form>` внутри чужой `<form>`
@@ -573,6 +594,87 @@ purchase», и форму не пускает всё тот же встроен�
     serial.addEventListener('input', check);
     proof.addEventListener('change', check);
     check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+
+    /* Отправка без ухода со страницы.
+
+       Без этого куска форма всё равно рабочая: браузер уйдёт на verp и покажет
+       купон там, на нашей странице. Но уход с витрины рвёт сессию и корзину
+       покупателя, поэтому запрос идёт фоном, а ответ рисуется на месте формы.
+
+       ⚠️ Браузер без fetch или FormData ничего не перехватывает и отправляет
+       форму обычным способом. Это и есть запасной путь, а не поломка. */
+    if (!window.fetch || !window.FormData) return;
+
+    var btn = form.querySelector('button[type="submit"]');
+    if (!btn) return;
+
+    var out = document.createElement('div');
+    out.className = 'bdg-result';
+    out.hidden = true;
+    form.parentNode.insertBefore(out, form.nextSibling);
+
+    function show(html) {
+      out.innerHTML = html;
+      out.hidden = false;
+      out.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /* ⚠️ submit не наступает, пока форма невалидна, — значит check() выше
+       по-прежнему стережёт «серийник или чек», и переносить его не пришлось. */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending\u2026';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        /* ⚠️ Без этого заголовка сервер отвечает целой HTML-страницей — так
+           устроен запасной путь для формы без скрипта. Здесь нужен JSON. */
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (b) {
+          if (b && b.ok) {
+            /* Код приходит от нашего сервера и состоит из букв, цифр и дефиса.
+               Чистится всё равно: он идёт в innerHTML, и полагаться на то, что
+               на том конце ничего не поменяется, — не наша роль. */
+            var code = String(b.code || '').replace(/[^A-Za-z0-9-]/g, '');
+            form.hidden = true;
+            show(
+              '<p class="bdg-result-title">Your rebate code</p>' +
+              '<p class="bdg-result-code">' + code + '</p>' +
+              '<p class="bdg-result-note">Enter this code at checkout to redeem.' +
+              (b.sms ? ' We have also sent it to your phone.' : '') +
+              ' A copy is on its way to your email.</p>' +
+              '<a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem your rebate</a>'
+            );
+          } else {
+            var lines = [];
+            if (b && b.errors) {
+              for (var k in b.errors) {
+                if (Object.prototype.hasOwnProperty.call(b.errors, k)) {
+                  lines = lines.concat(b.errors[k]);
+                }
+              }
+            }
+            show('<p class="bdg-result-error">' +
+                 (lines.length ? lines.join('<br>')
+                               : ((b && b.error) || 'Something went wrong. Please try again.')) +
+                 '</p>');
+          }
+        })
+        .catch(function () {
+          show('<p class="bdg-result-error">We could not reach the server. ' +
+               'Please check your connection and try again.</p>');
+        })
+        .then(function () {
+          btn.textContent = label;
+          btn.disabled = false;
+        });
+    });
   }
 
   /* Ждать разметку, если код выполняется раньше неё. Здесь, в конце фрагмента,
@@ -617,8 +719,12 @@ Script Manager годится и `Footer`, и `Header`.
       показать «Enter the serial number or attach your proof of purchase»).
       Отправилась — тема вырезала скрипт, см. раздел про Script Manager.
 - [ ] Форма: Submit без галочки не отправляет заявку
-- [ ] Форма: заполнить всё и отправить по-настоящему — заявка дошла
-      до обработчика со всеми полями
+- [ ] **Форма: заполнить всё и отправить по-настоящему — купон появляется
+      ПРЯМО НА СТРАНИЦЕ, без перехода куда-либо.** Адрес в строке браузера
+      не меняется, форма скрывается, на её месте — код вида `ML-XXXXXX`.
+      Ушли на verp.getoutlier.com — значит тема вырезала скрипт,
+      см. раздел про Script Manager.
+- [ ] Форма: код пришёл на почту (и в SMS, если номер уже подписан)
 
 ## Если тема вырезает `<style>`
 Некоторые сборки Stencil чистят inline-стили. Тогда содержимое `<style>`

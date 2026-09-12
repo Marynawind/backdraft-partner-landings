@@ -341,6 +341,11 @@
   border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:var(--radius);
   background:var(--lift);padding:var(--pad-card);
 }
+/* ⚠️ Без этой строки форма НЕ прячется, когда скрипт ставит ей `hidden`:
+   у браузерного правила [hidden]{display:none} специфичность ниже, чем у
+   класса с display:grid, и атрибут молча ни на что не влияет. Ровно то же
+   касается .bdg-field ниже — display в классе всегда перебивает hidden. */
+.bdg-form[hidden]{display:none;}
 .bdg-field{display:flex;flex-direction:column;gap:var(--s1);min-width:0;}
 /* Серийник и чек вынесены в общий блок с разделителем «or» между ними: иначе
    из подписей не видно, что достаточно одного. Блок уже формы намеренно —
@@ -453,6 +458,30 @@
    правилом display, но послушно заполняет уведённое. Заполнено — письмо
    отбрасывается на стороне сервиса. */
 .bdg-trap{position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;}
+
+/* Ответ сервера встаёт на место формы. Контур тот же, что у неё, вместе с
+   латунной полосой слева: это продолжение той же карточки, а не всплывшее
+   окно — человек никуда не уходил, и страница не должна делать вид, что ушёл. */
+.bdg-result{
+  margin-top:var(--s6);
+  border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:var(--radius);
+  background:var(--lift);padding:var(--pad-card);
+}
+.bdg-result-title{font-size:var(--t-card);color:#fff;margin-bottom:var(--s2);}
+/* Код набирают руками в поле на кассе. Поэтому моноширинный (0 и O, 1 и l
+   в пропорциональном шрифте сливаются) и разреженный, а `user-select:all`
+   даёт выделить его целиком одним щелчком вместо возни с выделением.
+   Перенос по любому символу — на телефоне код длиннее колонки. */
+.bdg-result-code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:.12em;
+  color:var(--brass-lit);word-break:break-all;user-select:all;
+  margin-bottom:var(--s3);
+}
+.bdg-result-note{color:var(--muted);font-size:var(--t-body);margin-bottom:var(--s4);}
+/* Не var(--brass): ошибка должна читаться как ошибка, а латунь тут — цвет
+   удачи. Приглушённый красный, а не чистый: на графите чистый жжёт глаза. */
+.bdg-result-error{color:#E79A9A;font-size:var(--t-body);}
 
 
 /* ---------- 3. How to Redeem --------------------------------------------- */
@@ -633,13 +662,14 @@ figure.bdg-poster{position:relative;}
 </section>
 
 <!-- 2. Claim your rebate -->
-<!-- ⚠️ У формы ЕЩЁ НЕТ адреса: action ниже — заглушка. Пока она не заменена
-     на настоящий обработчик, форма ничего не отправляет. См. DEPLOY.md. -->
+<!-- Форма уходит в Outlier VERP: он записывает заявку, создаёт купон в
+     BigCommerce и возвращает код — скрипт в конце страницы рисует его здесь
+     же, не уводя человека с витрины. См. DEPLOY.md. -->
 <section class="bdg-claim" id="claim">
   <div class="bdg-wrap">
     <h2>Submit Meprolight Proof of Purchase and instantly receive your rebate code.</h2>
 
-    <form class="bdg-form" method="post" enctype="multipart/form-data" action="REPLACE-WITH-FORM-ENDPOINT">
+    <form class="bdg-form" method="post" enctype="multipart/form-data" action="https://verp.getoutlier.com/rebate-claim/">
       <input type="hidden" name="partner" value="Meprolight Optics">
 
       <div class="bdg-field">
@@ -802,6 +832,87 @@ figure.bdg-poster{position:relative;}
     serial.addEventListener('input', check);
     proof.addEventListener('change', check);
     check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+
+    /* Отправка без ухода со страницы.
+
+       Без этого куска форма всё равно рабочая: браузер уйдёт на verp и покажет
+       купон там, на нашей странице. Но уход с витрины рвёт сессию и корзину
+       покупателя, поэтому запрос идёт фоном, а ответ рисуется на месте формы.
+
+       ⚠️ Браузер без fetch или FormData ничего не перехватывает и отправляет
+       форму обычным способом. Это и есть запасной путь, а не поломка. */
+    if (!window.fetch || !window.FormData) return;
+
+    var btn = form.querySelector('button[type="submit"]');
+    if (!btn) return;
+
+    var out = document.createElement('div');
+    out.className = 'bdg-result';
+    out.hidden = true;
+    form.parentNode.insertBefore(out, form.nextSibling);
+
+    function show(html) {
+      out.innerHTML = html;
+      out.hidden = false;
+      out.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /* ⚠️ submit не наступает, пока форма невалидна, — значит check() выше
+       по-прежнему стережёт «серийник или чек», и переносить его не пришлось. */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending\u2026';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        /* ⚠️ Без этого заголовка сервер отвечает целой HTML-страницей — так
+           устроен запасной путь для формы без скрипта. Здесь нужен JSON. */
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (b) {
+          if (b && b.ok) {
+            /* Код приходит от нашего сервера и состоит из букв, цифр и дефиса.
+               Чистится всё равно: он идёт в innerHTML, и полагаться на то, что
+               на том конце ничего не поменяется, — не наша роль. */
+            var code = String(b.code || '').replace(/[^A-Za-z0-9-]/g, '');
+            form.hidden = true;
+            show(
+              '<p class="bdg-result-title">Your rebate code</p>' +
+              '<p class="bdg-result-code">' + code + '</p>' +
+              '<p class="bdg-result-note">Enter this code at checkout to redeem.' +
+              (b.sms ? ' We have also sent it to your phone.' : '') +
+              ' A copy is on its way to your email.</p>' +
+              '<a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem your rebate</a>'
+            );
+          } else {
+            var lines = [];
+            if (b && b.errors) {
+              for (var k in b.errors) {
+                if (Object.prototype.hasOwnProperty.call(b.errors, k)) {
+                  lines = lines.concat(b.errors[k]);
+                }
+              }
+            }
+            show('<p class="bdg-result-error">' +
+                 (lines.length ? lines.join('<br>')
+                               : ((b && b.error) || 'Something went wrong. Please try again.')) +
+                 '</p>');
+          }
+        })
+        .catch(function () {
+          show('<p class="bdg-result-error">We could not reach the server. ' +
+               'Please check your connection and try again.</p>');
+        })
+        .then(function () {
+          btn.textContent = label;
+          btn.disabled = false;
+        });
+    });
   }
 
   /* Ждать разметку, если код выполняется раньше неё. Здесь, в конце фрагмента,
