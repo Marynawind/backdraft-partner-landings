@@ -346,6 +346,10 @@
    класса с display:grid, и атрибут молча ни на что не влияет. Ровно то же
    касается .bdg-field ниже — display в классе всегда перебивает hidden. */
 .bdg-form[hidden]{display:none;}
+/* Та же история для заголовка секции: он прячется вместе с формой, когда на
+   её месте появляется код. Тема магазина вполне может задать своим h2
+   display, а он перебьёт браузерный [hidden] — поэтому правило явное. */
+.bdg-claim h2[hidden]{display:none;}
 .bdg-field{display:flex;flex-direction:column;gap:var(--s1);min-width:0;}
 /* Серийник и чек вынесены в общий блок с разделителем «or» между ними: иначе
    из подписей не видно, что достаточно одного. Блок уже формы намеренно —
@@ -835,7 +839,7 @@ figure.bdg-poster{position:relative;}
     /* Отправка без ухода со страницы.
 
        Без этого куска форма всё равно рабочая: браузер уйдёт на verp и покажет
-       купон там, на нашей странице. Но уход с витрины рвёт сессию и корзину
+       купон там, не на нашей странице. Но уход с витрины рвёт сессию и корзину
        покупателя, поэтому запрос идёт фоном, а ответ рисуется на месте формы.
 
        ⚠️ Браузер без fetch или FormData ничего не перехватывает и отправляет
@@ -844,26 +848,68 @@ figure.bdg-poster{position:relative;}
 
     var btn = form.querySelector('button[type="submit"]');
     if (!btn) return;
+    var label = btn.textContent;
 
     var out = document.createElement('div');
     out.className = 'bdg-result';
+    /* Блок рождается уже после загрузки страницы, и экранный диктор сам его не
+       заметит: код появится молча. role/aria-live заставляют прочитать его. */
+    out.setAttribute('role', 'status');
+    out.setAttribute('aria-live', 'polite');
     out.hidden = true;
     form.parentNode.insertBefore(out, form.nextSibling);
 
-    function show(html) {
-      out.innerHTML = html;
+    /* Заголовок секции — «Submit Meprolight Proof of Purchase…». Когда форма
+       уступает место коду, он начинает врать, поэтому прячется вместе с ней. */
+    var heading = form.previousElementSibling;
+    if (!heading || heading.tagName !== 'H2') heading = null;
+
+    /* Узлы собираются DOM-методами, а текст кладётся через textContent.
+       Это не стилистика: строки ниже приходят с сервера, и склейка их
+       в innerHTML означала бы, что любой текст оттуда исполняется на витрине
+       магазина как разметка. Полагаться на то, что на том конце ничего
+       никогда не поменяется, — не наша роль. */
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    function show(nodes) {
+      while (out.firstChild) out.removeChild(out.firstChild);
+      for (var i = 0; i < nodes.length; i++) out.appendChild(nodes[i]);
       out.hidden = false;
       out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    function showError(texts) {
+      var nodes = [];
+      for (var i = 0; i < texts.length; i++) {
+        nodes.push(el('p', 'bdg-result-error', texts[i]));
+      }
+      show(nodes);
+    }
+
+    var sending = false;
 
     /* ⚠️ submit не наступает, пока форма невалидна, — значит check() выше
        по-прежнему стережёт «серийник или чек», и переносить его не пришлось. */
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      var label = btn.textContent;
+      /* ⚠️ Не лишняя проверка: Enter в текстовом поле отправляет форму даже
+         тогда, когда кнопка выключена. Без флага уходил бы второй запрос —
+         и второе SMS покупателю. */
+      if (sending) return;
+      sending = true;
+
       btn.disabled = true;
       btn.textContent = 'Sending\u2026';
+
+      /* Различаем «не достучались» и «ответили не тем»: покупателю незачем
+         проверять свой интернет, когда упал наш сервер. */
+      var reached = false;
 
       fetch(form.action, {
         method: 'POST',
@@ -872,42 +918,80 @@ figure.bdg-poster{position:relative;}
            устроен запасной путь для формы без скрипта. Здесь нужен JSON. */
         headers: { 'Accept': 'application/json' }
       })
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+          reached = true;
+          /* Не по r.ok: отказ по полям приходит статусом 422 и тоже JSON,
+             его надо разобрать и показать. А вот не-JSON — это уже не наш
+             протокол: 500, заглушка защиты, отказ из-за размера фото.
+             Content-Type читается и с чужого домена, разрешения не нужно. */
+          var type = r.headers.get('content-type') || '';
+          if (type.indexOf('json') === -1) throw new Error('not json');
+          return r.json();
+        })
         .then(function (b) {
-          if (b && b.ok) {
-            /* Код приходит от нашего сервера и состоит из букв, цифр и дефиса.
-               Чистится всё равно: он идёт в innerHTML, и полагаться на то, что
-               на том конце ничего не поменяется, — не наша роль. */
-            var code = String(b.code || '').replace(/[^A-Za-z0-9-]/g, '');
-            form.hidden = true;
-            show(
-              '<p class="bdg-result-title">Your rebate code</p>' +
-              '<p class="bdg-result-code">' + code + '</p>' +
-              '<p class="bdg-result-note">Enter this code at checkout to redeem.' +
-              (b.sms ? ' We have also sent it to your phone.' : '') +
-              ' A copy is on its way to your email.</p>' +
-              '<a class="bdg-btn bdg-btn--solid" href="https://backdraftsuppressors.com/backdraft-hunter/">Redeem your rebate</a>'
-            );
-          } else {
-            var lines = [];
+          if (!b || !b.ok) {
+            var texts = [];
             if (b && b.errors) {
               for (var k in b.errors) {
                 if (Object.prototype.hasOwnProperty.call(b.errors, k)) {
-                  lines = lines.concat(b.errors[k]);
+                  texts = texts.concat(b.errors[k]);
                 }
               }
             }
-            show('<p class="bdg-result-error">' +
-                 (lines.length ? lines.join('<br>')
-                               : ((b && b.error) || 'Something went wrong. Please try again.')) +
-                 '</p>');
+            if (!texts.length) {
+              texts = [(b && b.error) || 'Something went wrong. Please try again.'];
+            }
+            showError(texts);
+            return;
           }
+
+          /* Код набирают руками на кассе, поэтому из него выбрасывается всё,
+             кроме букв, цифр и дефиса: невидимый пробел с той стороны — это
+             код, который не сработает, а человек не поймёт почему. */
+          var code = String(b.code || '').replace(/[^A-Za-z0-9-]/g, '');
+
+          form.hidden = true;
+          if (heading) heading.hidden = true;
+
+          /* Заявка принята, а кода в ответе нет. Так быть не должно, но пустой
+             блок под заголовком «Your rebate code» — худшее, что можно
+             показать: человек решит, что всё сломалось, хотя код уже выпущен
+             и уходит письмом. */
+          if (!code) {
+            show([
+              el('p', 'bdg-result-title', 'Your claim is in'),
+              el('p', 'bdg-result-note', 'Your code did not come back with this reply, ' +
+                 'but a copy is on its way to your email. If it does not arrive within ' +
+                 'an hour, contact us.')
+            ]);
+            return;
+          }
+
+          var note = b.already_issued
+            ? 'You have already claimed this rebate — this is the same code. ' +
+              'Enter it at checkout to redeem.'
+            : 'Enter this code at checkout to redeem.' +
+              (b.sms ? ' We have also sent it to your phone.' : '') +
+              ' A copy is on its way to your email.';
+
+          var link = el('a', 'bdg-btn bdg-btn--solid', 'Redeem your rebate');
+          link.href = 'https://backdraftsuppressors.com/backdraft-hunter/';
+
+          show([
+            el('p', 'bdg-result-title', 'Your rebate code'),
+            el('p', 'bdg-result-code', code),
+            el('p', 'bdg-result-note', note),
+            link
+          ]);
         })
         .catch(function () {
-          show('<p class="bdg-result-error">We could not reach the server. ' +
-               'Please check your connection and try again.</p>');
+          showError([reached
+            ? 'Something went wrong on our side. Your claim may not have gone through — ' +
+              'please try again in a few minutes.'
+            : 'We could not reach the server. Please check your connection and try again.']);
         })
         .then(function () {
+          sending = false;
           btn.textContent = label;
           btn.disabled = false;
         });
