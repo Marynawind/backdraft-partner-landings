@@ -306,6 +306,8 @@
 .bdg-copy:focus-visible{outline:2px solid var(--brass-lit);outline-offset:2px;}
 
 .bdg-copy.is-done{background:var(--brass);color:#17181B;}
+
+.bdg-result-actions{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center;}
 .bdg-result-note{color:var(--muted);font-size:var(--t-body);margin-bottom:var(--s4);}
 
 .bdg-result-error{color:#E79A9A;font-size:var(--t-body);}
@@ -657,6 +659,24 @@ figure.bdg-poster{position:relative;}
       show(nodes);
     }
 
+    function againButton() {
+      var button = el('button', 'bdg-btn bdg-btn--ghost', 'Claim another rebate');
+
+      button.type = 'button';
+      button.addEventListener('click', function () {
+        form.reset();
+
+        check();
+        out.hidden = true;
+        form.hidden = false;
+        if (heading) heading.hidden = false;
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var first = form.querySelector('#bdg-name');
+        if (first) first.focus();
+      });
+      return button;
+    }
+
     var sending = false;
 
     form.addEventListener('submit', function (e) {
@@ -730,11 +750,15 @@ figure.bdg-poster{position:relative;}
           codeLine.appendChild(codeNode);
           codeLine.appendChild(copyButton(code, codeNode));
 
+          var actions = el('div', 'bdg-result-actions');
+          actions.appendChild(link);
+          actions.appendChild(againButton());
+
           show([
             el('p', 'bdg-result-title', 'Your rebate code'),
             codeLine,
             el('p', 'bdg-result-note', note),
-            link
+            actions
           ]);
         })
         .catch(function () {

@@ -579,39 +579,7 @@ purchase», и форму не пускает всё тот же встроен�
 Это единственный JS на странице; всё остальное по-прежнему работает без него.
 
 ⚠️ **ПРОВЕРИТЬ СРАЗУ ПОСЛЕ ВСТАВКИ В BIGCOMMERCE.** Редактор страницы вырезает
-теги, которые считает опасными, и `<script>` — первый кандидат (`<style>` он
-вырезает точно, если вставлять не в режиме HTML-источника). Проверка занимает
-полминуты: открыть опубликованную страницу, заполнить имя, почту, телефон,
-поставить галочку, оставить серийник и чек пустыми и нажать Submit. Если форма
-ушла — скрипт вырезан.
-
-⚠️ **Если скрипт не выполнится — форма НЕ ломается.** Она останется полностью
-рабочей и просто перестанет стеречь это одно правило, как было до 12.09.2026:
-заявка сможет прийти без серийника и без чека. Сделано намеренно — молча не
-отправляющаяся форма хуже, чем форма, пропускающая неполную заявку.
-
-Поэтому подстраховаться на стороне обработчика всё равно стоит: большинство
-сервисов форм умеет отбрасывать или помечать заявку, где пусты оба поля. Это
-две минуты настройки и единственная защита от покупателя с отключённым JS.
-
-### Если BigCommerce вырезал скрипт — запасной путь
-
-У магазина есть штатное место для скриптов, которое ничего не вырезает:
-**Storefront → Script Manager → Create a Script**.
-
-| Поле | Что поставить |
-|------|---------------|
-| Name | `Meprolight rebate form rule` |
-| Location on page | `Footer` |
-| Select pages | `Specific Pages` → страница `/meprolight` |
-| Script type | `Script` |
-| Script category | `Essential` |
-
-В поле кода вставить ровно это — тот же текст, что лежит в конце
-`page.src.html`, включая теги:
-
-```html
-<script>
+теги, которые считает опасными, и `<script>
 (function () {
   function init() {
     var form = document.querySelector('.bdg-form');
@@ -731,6 +699,24 @@ purchase», и форму не пускает всё тот же встроен�
       show(nodes);
     }
 
+    function againButton() {
+      var button = el('button', 'bdg-btn bdg-btn--ghost', 'Claim another rebate');
+
+      button.type = 'button';
+      button.addEventListener('click', function () {
+        form.reset();
+
+        check();
+        out.hidden = true;
+        form.hidden = false;
+        if (heading) heading.hidden = false;
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var first = form.querySelector('#bdg-name');
+        if (first) first.focus();
+      });
+      return button;
+    }
+
     var sending = false;
 
     form.addEventListener('submit', function (e) {
@@ -804,11 +790,15 @@ purchase», и форму не пускает всё тот же встроен�
           codeLine.appendChild(codeNode);
           codeLine.appendChild(copyButton(code, codeNode));
 
+          var actions = el('div', 'bdg-result-actions');
+          actions.appendChild(link);
+          actions.appendChild(againButton());
+
           show([
             el('p', 'bdg-result-title', 'Your rebate code'),
             codeLine,
             el('p', 'bdg-result-note', note),
-            link
+            actions
           ]);
         })
         .catch(function () {
