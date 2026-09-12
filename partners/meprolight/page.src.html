@@ -414,7 +414,15 @@
 }
 .bdg-file:hover{border-color:var(--brass);}
 .bdg-file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
-.bdg-file-btn{pointer-events:none;}
+.bdg-file-btn{pointer-events:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Файл выбран. Без этого состояния человек не понимает, приложился чек или
+   нет: диалог закрылся, а на странице всё то же «Choose file». Имя файла и
+   есть подтверждение — оно приходит от самого человека, и он его узнаёт.
+   ⚠️ Имя обрезается многоточием, а не переносится: `IMG_20260912_134501.HEIC`
+   на телефоне занял бы две строки и растащил бы форму. Целиком оно видно
+   в подсказке (title). */
+.bdg-file.is-chosen{border-color:var(--brass);background:rgba(189,133,49,.12);}
+.bdg-file.is-chosen .bdg-file-btn::before{content:"\2713\00a0";}
 /* Рамка фокуса — на коробке, потому что само поле прозрачное. :has читают все
    нынешние браузеры; где не прочтут, фокус просто не подсветится. */
 .bdg-file:has(.bdg-file-input:focus-visible){
@@ -858,9 +866,31 @@ figure.bdg-poster{position:relative;}
       proof.setCustomValidity(message);
     }
 
+    /* Диалог выбора файла закрылся — и это всё, что происходило: страница
+       оставалась с надписью «Choose file», и человек не знал, приложился ли
+       чек. Теперь на кнопке стоит имя выбранного файла. */
+    var fileBox = form.querySelector('.bdg-file');
+    var fileBtn = form.querySelector('.bdg-file-btn');
+    var fileLabel = fileBtn ? fileBtn.textContent : '';
+
+    function showChosenFile() {
+      if (!fileBtn || !fileBox) return;
+      var picked = proof.files && proof.files.length ? proof.files[0] : null;
+      if (picked) {
+        fileBtn.textContent = picked.name;
+        fileBox.title = picked.name;
+        fileBox.className = 'bdg-file is-chosen';
+      } else {
+        fileBtn.textContent = fileLabel;
+        fileBox.removeAttribute('title');
+        fileBox.className = 'bdg-file';
+      }
+    }
+
     serial.addEventListener('input', check);
-    proof.addEventListener('change', check);
-    check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+    proof.addEventListener('change', function () { check(); showChosenFile(); });
+    check();
+    showChosenFile();   /* назад по истории браузер возвращает выбранный файл */   // на загрузке: оба пусты, значит форма уже несдаваемая
 
     /* Отправка без ухода со страницы.
 
@@ -1004,8 +1034,10 @@ figure.bdg-poster{position:relative;}
         form.reset();
         /* reset() возвращает полям исходные значения, но НЕ трогает
            customValidity: без повторного check() форма осталась бы
-           неотправляемой с прошлым текстом ошибки. */
+           неотправляемой с прошлым текстом ошибки. И имя файла на кнопке
+           reset() тоже не убирает — оно нарисовано нами. */
         check();
+        showChosenFile();
         out.hidden = true;
         form.hidden = false;
         if (heading) heading.hidden = false;

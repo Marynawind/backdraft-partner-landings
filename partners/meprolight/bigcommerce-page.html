@@ -249,7 +249,10 @@
 }
 .bdg-file:hover{border-color:var(--brass);}
 .bdg-file-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
-.bdg-file-btn{pointer-events:none;}
+.bdg-file-btn{pointer-events:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.bdg-file.is-chosen{border-color:var(--brass);background:rgba(189,133,49,.12);}
+.bdg-file.is-chosen .bdg-file-btn::before{content:"\2713\00a0";}
 
 .bdg-file:has(.bdg-file-input:focus-visible){
   outline:2px solid var(--brass-lit);outline-offset:2px;border-color:var(--brass);
@@ -557,9 +560,28 @@ figure.bdg-poster{position:relative;}
       proof.setCustomValidity(message);
     }
 
+    var fileBox = form.querySelector('.bdg-file');
+    var fileBtn = form.querySelector('.bdg-file-btn');
+    var fileLabel = fileBtn ? fileBtn.textContent : '';
+
+    function showChosenFile() {
+      if (!fileBtn || !fileBox) return;
+      var picked = proof.files && proof.files.length ? proof.files[0] : null;
+      if (picked) {
+        fileBtn.textContent = picked.name;
+        fileBox.title = picked.name;
+        fileBox.className = 'bdg-file is-chosen';
+      } else {
+        fileBtn.textContent = fileLabel;
+        fileBox.removeAttribute('title');
+        fileBox.className = 'bdg-file';
+      }
+    }
+
     serial.addEventListener('input', check);
-    proof.addEventListener('change', check);
+    proof.addEventListener('change', function () { check(); showChosenFile(); });
     check();
+    showChosenFile();
 
     if (!window.fetch || !window.FormData) return;
 
@@ -667,6 +689,7 @@ figure.bdg-poster{position:relative;}
         form.reset();
 
         check();
+        showChosenFile();
         out.hidden = true;
         form.hidden = false;
         if (heading) heading.hidden = false;

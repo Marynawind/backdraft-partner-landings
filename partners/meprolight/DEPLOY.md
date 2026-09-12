@@ -597,9 +597,28 @@ purchase», и форму не пускает всё тот же встроен�
       proof.setCustomValidity(message);
     }
 
+    var fileBox = form.querySelector('.bdg-file');
+    var fileBtn = form.querySelector('.bdg-file-btn');
+    var fileLabel = fileBtn ? fileBtn.textContent : '';
+
+    function showChosenFile() {
+      if (!fileBtn || !fileBox) return;
+      var picked = proof.files && proof.files.length ? proof.files[0] : null;
+      if (picked) {
+        fileBtn.textContent = picked.name;
+        fileBox.title = picked.name;
+        fileBox.className = 'bdg-file is-chosen';
+      } else {
+        fileBtn.textContent = fileLabel;
+        fileBox.removeAttribute('title');
+        fileBox.className = 'bdg-file';
+      }
+    }
+
     serial.addEventListener('input', check);
-    proof.addEventListener('change', check);
+    proof.addEventListener('change', function () { check(); showChosenFile(); });
     check();
+    showChosenFile();
 
     if (!window.fetch || !window.FormData) return;
 
@@ -707,6 +726,7 @@ purchase», и форму не пускает всё тот же встроен�
         form.reset();
 
         check();
+        showChosenFile();
         out.hidden = true;
         form.hidden = false;
         if (heading) heading.hidden = false;
