@@ -680,6 +680,76 @@ purchase», и форму не пускает всё тот же встроен�
       out.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    /* Копирование кода. Код набирают руками на кассе, и ошибиться в нём легко:
+       кнопка рядом надёжнее, чем выделять мышью мелкий текст на телефоне.
+
+       Три ступени, сверху вниз: современный clipboard API; старый execCommand
+       для браузеров без него и для страниц, открытых не по https; а если не
+       вышло и это — код просто выделяется, человеку остаётся нажать копирование
+       самому. Молча не делать ничего нельзя: нажали кнопку — что-то должно
+       произойти. */
+    function flash(button, text) {
+      button.textContent = text;
+      button.className = 'bdg-copy is-done';
+      clearTimeout(button.timer);
+      button.timer = setTimeout(function () {
+        button.textContent = 'Copy';
+        button.className = 'bdg-copy';
+      }, 2000);
+    }
+
+    function legacyCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      /* Уведено за край, а не спрятано правилом: из скрытого display:none поля
+         выделять нечего, и копирование вернёт пустоту. readonly — чтобы на
+         телефоне не выезжала клавиатура. */
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      ta.style.top = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
+
+    function selectNode(node) {
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch (err) { /* выделить не вышло — код и так на экране */ }
+    }
+
+    function copyButton(text, codeNode) {
+      var button = el('button', 'bdg-copy', 'Copy');
+      /* ⚠️ type обязателен: кнопка вне формы, но тема магазина может завернуть
+         страницу в свою, и тогда кнопка без type отправит её. */
+      button.type = 'button';
+
+      function fallback() {
+        if (legacyCopy(text)) { flash(button, 'Copied'); return; }
+        selectNode(codeNode);
+        button.textContent = 'Select & copy';
+      }
+
+      button.addEventListener('click', function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            flash(button, 'Copied');
+          }, fallback);
+          return;
+        }
+        fallback();
+      });
+      return button;
+    }
+
     function showError(texts) {
       var nodes = [];
       for (var i = 0; i < texts.length; i++) {
@@ -774,9 +844,14 @@ purchase», и форму не пускает всё тот же встроен�
           var link = el('a', 'bdg-btn bdg-btn--solid', 'Redeem your rebate');
           link.href = 'https://backdraftsuppressors.com/backdraft-hunter/';
 
+          var codeNode = el('p', 'bdg-result-code', code);
+          var codeLine = el('div', 'bdg-result-codeline');
+          codeLine.appendChild(codeNode);
+          codeLine.appendChild(copyButton(code, codeNode));
+
           show([
             el('p', 'bdg-result-title', 'Your rebate code'),
-            el('p', 'bdg-result-code', code),
+            codeLine,
             el('p', 'bdg-result-note', note),
             link
           ]);

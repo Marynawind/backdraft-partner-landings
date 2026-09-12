@@ -108,7 +108,40 @@ number or attach your proof of purchase.»
 ⚠️ Звёздочки у подписей серийника и чека намеренно НЕТ: она значит «это поле
 обязательно», а обязательна здесь пара, а не поле. Отсюда и отдельная строка.
 
-⚠️ Форма пока никуда не отправляет: адрес обработчика не выбран, см. DEPLOY.md.
+### Что появляется на месте формы после отправки
+
+Форма уходит на наш сервер фоном, и на её месте — вместе со скрытым заголовком
+секции — встаёт ответ. Тексты:
+
+**Заголовок:** Your rebate code
+**Кнопка копирования:** Copy → **Copied** на две секунды после нажатия
+(и **Select & copy**, если браузер копировать не дал — тогда код просто
+выделяется, человеку остаётся нажать копирование самому)
+**Подпись:** Enter this code at checkout to redeem. We have also sent it to your
+phone. A copy is on its way to your email.
+**Кнопка:** Redeem your rebate
+
+Фраза про телефон появляется, только если сервер сказал, что SMS ушло. Если код
+выдавали раньше, подпись другая: «You have already claimed this rebate — this is
+the same code. Enter it at checkout to redeem.»
+
+Кнопка копирования — просьба клиента от 12.09.2026: код набирают руками на
+кассе, и выделять мелкий моноширинный текст на телефоне неудобно. Выделение
+по щелчку (`user-select:all`) при этом осталось — кнопка его не заменяет,
+а дополняет.
+
+**Если заявка принята, но кода в ответе нет:** Your claim is in / Your code did
+not come back with this reply, but a copy is on its way to your email. If it
+does not arrive within an hour, contact us.
+
+**Если сервер ответил не по протоколу:** Something went wrong on our side. Your
+claim may not have gone through — please try again in a few minutes.
+
+**Если запрос не дошёл:** We could not reach the server. Please check your
+connection and try again.
+
+Две последние формулировки намеренно разные: советовать проверить интернет,
+когда упал наш сервер, — значит отправить человека чинить то, что цело.
 
 ## 3. How to Redeem Your Rebate
 
