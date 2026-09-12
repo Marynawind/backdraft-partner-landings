@@ -783,24 +783,37 @@ figure.bdg-poster{position:relative;}
      нажать Submit с пустыми серийником и чеком. См. DEPLOY.md. -->
 <script>
 (function () {
-  var form = document.querySelector('.bdg-form');
-  if (!form) return;
-  var serial = form.querySelector('#bdg-serial');
-  var proof = form.querySelector('#bdg-proof');
-  if (!serial || !proof || !serial.setCustomValidity) return;
+  function init() {
+    var form = document.querySelector('.bdg-form');
+    if (!form) return;
+    var serial = form.querySelector('#bdg-serial');
+    var proof = form.querySelector('#bdg-proof');
+    if (!serial || !proof || !serial.setCustomValidity) return;
 
-  function check() {
-    // .files есть везде, где есть setCustomValidity; проверка на всякий случай
-    var filled = serial.value.trim() !== '' ||
-                 (proof.files ? proof.files.length > 0 : proof.value !== '');
-    var message = filled ? '' : 'Enter the serial number or attach your proof of purchase.';
-    serial.setCustomValidity(message);
-    proof.setCustomValidity(message);
+    function check() {
+      // .files есть везде, где есть setCustomValidity; проверка на всякий случай
+      var filled = serial.value.trim() !== '' ||
+                   (proof.files ? proof.files.length > 0 : proof.value !== '');
+      var message = filled ? '' : 'Enter the serial number or attach your proof of purchase.';
+      serial.setCustomValidity(message);
+      proof.setCustomValidity(message);
+    }
+
+    serial.addEventListener('input', check);
+    proof.addEventListener('change', check);
+    check();   // на загрузке: оба пусты, значит форма уже несдаваемая
   }
 
-  serial.addEventListener('input', check);
-  proof.addEventListener('change', check);
-  check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+  /* Ждать разметку, если код выполняется раньше неё. Здесь, в конце фрагмента,
+     форма уже существует и init() пойдёт сразу. Ожидание нужно не для этого
+     места, а для запасного: если BigCommerce вырежет скрипт из страницы, ровно
+     этот же код кладётся в Script Manager, а он вставляет его в <head>, то есть
+     до формы. Так один и тот же текст работает в обоих местах без правок. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 </script>
 

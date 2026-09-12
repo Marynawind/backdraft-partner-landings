@@ -26,6 +26,7 @@ import re
 HERE = pathlib.Path(__file__).parent
 PAGE = HERE / "page.src.html"
 POSTER_MAP = HERE / "assets" / "poster-map.json"
+DEPLOY = HERE / "DEPLOY.md"
 LINK_MARKER = "<!--poster-links-->"
 
 
@@ -99,8 +100,27 @@ def inline(page: str) -> str:
     return page
 
 
+def check_deploy_copy(page: str) -> None:
+    """Сверить копию скрипта в DEPLOY.md с тем, что на странице.
+
+    В DEPLOY.md лежит запасной план: если BigCommerce вырежет скрипт из
+    страницы, тот же код кладут в Script Manager — копипастом из инструкции.
+    План работает ровно до тех пор, пока копия совпадает с оригиналом, а
+    разойтись они могут молча. Поэтому сборка их сверяет и падает.
+    """
+    m = re.search(r"<script>.*?</script>", page, re.S)
+    if not m:
+        return                      # скрипта нет — нечего и сверять
+    if m.group(0) not in DEPLOY.read_text(encoding="utf-8"):
+        raise SystemExit(
+            "скрипт в page.src.html разошёлся с копией в DEPLOY.md — "
+            "перенесите новый текст в раздел про Script Manager")
+
+
 if __name__ == "__main__":
-    standalone = inline(poster(PAGE.read_text(encoding="utf-8")))
+    page_src = PAGE.read_text(encoding="utf-8")
+    check_deploy_copy(page_src)
+    standalone = inline(poster(page_src))
     for name, body in (("bigcommerce-page.html", standalone),
                        ("preview.html", PREVIEW_HEAD + standalone + PREVIEW_FOOT)):
         out = HERE / name

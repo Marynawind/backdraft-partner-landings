@@ -534,6 +534,72 @@ purchase», и форму не пускает всё тот же встроен�
 сервисов форм умеет отбрасывать или помечать заявку, где пусты оба поля. Это
 две минуты настройки и единственная защита от покупателя с отключённым JS.
 
+### Если BigCommerce вырезал скрипт — запасной путь
+
+У магазина есть штатное место для скриптов, которое ничего не вырезает:
+**Storefront → Script Manager → Create a Script**.
+
+| Поле | Что поставить |
+|------|---------------|
+| Name | `Meprolight rebate form rule` |
+| Location on page | `Footer` |
+| Select pages | `Specific Pages` → страница `/meprolight` |
+| Script type | `Script` |
+| Script category | `Essential` |
+
+В поле кода вставить ровно это — тот же текст, что лежит в конце
+`page.src.html`, включая теги:
+
+```html
+<script>
+(function () {
+  function init() {
+    var form = document.querySelector('.bdg-form');
+    if (!form) return;
+    var serial = form.querySelector('#bdg-serial');
+    var proof = form.querySelector('#bdg-proof');
+    if (!serial || !proof || !serial.setCustomValidity) return;
+
+    function check() {
+      // .files есть везде, где есть setCustomValidity; проверка на всякий случай
+      var filled = serial.value.trim() !== '' ||
+                   (proof.files ? proof.files.length > 0 : proof.value !== '');
+      var message = filled ? '' : 'Enter the serial number or attach your proof of purchase.';
+      serial.setCustomValidity(message);
+      proof.setCustomValidity(message);
+    }
+
+    serial.addEventListener('input', check);
+    proof.addEventListener('change', check);
+    check();   // на загрузке: оба пусты, значит форма уже несдаваемая
+  }
+
+  /* Ждать разметку, если код выполняется раньше неё. Здесь, в конце фрагмента,
+     форма уже существует и init() пойдёт сразу. Ожидание нужно не для этого
+     места, а для запасного: если BigCommerce вырежет скрипт из страницы, ровно
+     этот же код кладётся в Script Manager, а он вставляет его в <head>, то есть
+     до формы. Так один и тот же текст работает в обоих местах без правок. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+```
+
+Код специально написан так, чтобы работать в обоих местах без правок: если
+разметки ещё нет, он дожидается её события `DOMContentLoaded`. Поэтому в
+Script Manager годится и `Footer`, и `Header`.
+
+После сохранения — та же проверка: заполнить имя, почту, телефон, поставить
+галочку, серийник и чек оставить пустыми, нажать Submit. Форма не должна уйти.
+
+⚠️ Скрипт в Script Manager живёт отдельно от страницы: правка `page.src.html`
+и пересборка его НЕ меняют. Если правило когда-нибудь поменяется, менять
+придётся в двух местах. `build.py` сверяет код на странице с копией в этом
+файле и падает, если они разошлись, — но про Script Manager он не знает.
+
 ## Проверить после публикации
 - [ ] Открывается по `/Meprolight`
 - [ ] Тёмные блоки во всю ширину, без белых полей по бокам
